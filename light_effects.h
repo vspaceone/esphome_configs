@@ -34,10 +34,10 @@ void pride_circle(AddressableLight& it, const Color* flag, uint8_t flag_len) {
     double leds_per_band = ((double)len/2.0) / (double)flag_len;
     for (uint16_t i = 0; i < flag_len; i++) {
         uint16_t pos = leds_per_band*i;
-        it.range(pos,pos+leds_per_band).set(flag[i]);
+        it.range(floor(pos),ceil(pos+leds_per_band)).set(flag[i]);
     }
     for (uint16_t i = 0; i < flag_len; i++) {
         uint16_t pos = len - (leds_per_band*i);
-        it.range(pos-leds_per_band,pos).set(flag[i]);
+        it.range(floor(pos-leds_per_band),ceil(pos)).set(flag[i]);
     }
 }

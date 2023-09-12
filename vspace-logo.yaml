@@ -68,6 +68,14 @@ light:
       - addressable_lambda:
           name: "Traaa"
           lambda: "pride_circle(it, trans_flag,5);"
+      - addressable_lambda:
+          name: "Sine"
+          update_interval: 5ms
+          lambda: |-
+            double m = millis()/10;
+            for (int i = 0; i < it.size(); i++) {
+              it[i] = current_color * ((sin((float(i*(360/it.size()))+m)*PI/180) + 1) * 127);
+            }
   - platform: neopixelbus
     type: GRB
     variant: WS2811
@@ -90,3 +98,11 @@ light:
       - addressable_lambda:
           name: "Traaa"
           lambda: "pride_circle(it, trans_flag,5);"
+      - addressable_lambda:
+          name: "Sine"
+          update_interval: 5ms
+          lambda: |-
+            double m = millis()/10;
+            for (int i = 0; i < it.size(); i++) {
+              it[i] = current_color * ((sin((float(i*(360/it.size()))+m)*PI/180) + 1) * 127);
+            }
