@@ -8,15 +8,16 @@ esphome:
       - light.turn_on:
           id: inner_strip
           brightness: 100%
-          red: 10%
+          red: 100%
           green: 100%
-          blue: 50%
+          blue: 100%
       - light.turn_on:
           id: rim_strip
-          brightness: 100%
-          red: 100%
-          green: 20%
-          blue: 80%
+          brightness: 50%
+          red: 0%
+          green: 100%
+          blue: 50%
+          effect: "Sine"
 
 esp8266:
   board: huzzah
@@ -47,6 +48,11 @@ wifi:
 
 captive_portal:
 
+binary_sensor:
+  - platform: status
+    id: onlinesatatus
+    name: "vspace_logo online"
+
 light:
   - platform: neopixelbus
     type: GRB
@@ -70,12 +76,9 @@ light:
           lambda: "pride_circle(it, trans_flag,5);"
       - addressable_lambda:
           name: "Sine"
-          update_interval: 5ms
+          update_interval: 10ms
           lambda: |-
-            double m = millis()/10;
-            for (int i = 0; i < it.size(); i++) {
-              it[i] = current_color * ((sin((float(i*(360/it.size()))+m)*PI/180) + 1) * 127);
-            }
+            sine_effect(it, current_color);
   - platform: neopixelbus
     type: GRB
     variant: WS2811
@@ -100,9 +103,6 @@ light:
           lambda: "pride_circle(it, trans_flag,5);"
       - addressable_lambda:
           name: "Sine"
-          update_interval: 5ms
+          update_interval: 10ms
           lambda: |-
-            double m = millis()/10;
-            for (int i = 0; i < it.size(); i++) {
-              it[i] = current_color * ((sin((float(i*(360/it.size()))+m)*PI/180) + 1) * 127);
-            }
+            sine_effect(it, current_color);

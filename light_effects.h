@@ -14,7 +14,7 @@ struct flag_t {
 
 Color pride_flag[] = {
     Color(255,0,0),
-    Color(255,128,0),
+    Color(255,192,0),
     Color(255,255,0),
     Color(0,255,0),
     Color(32,64,255),
@@ -40,4 +40,11 @@ void pride_circle(AddressableLight& it, const Color* flag, uint8_t flag_len) {
         uint16_t pos = len - (leds_per_band*i);
         it.range(floor(pos-leds_per_band),ceil(pos)).set(flag[i]);
     }
+}
+
+constexpr float two_pi = 2.0*PI;
+void sine_effect(AddressableLight& it, Color col) {
+	float m = millis()/3140.0;
+	uint16_t len = it.size();
+	for (uint16_t i = 0; i < len; i++) it[i].set_green( 127 * (std::sin( i*(two_pi/float(len-1.0)) +m) +1.0) );
 }
