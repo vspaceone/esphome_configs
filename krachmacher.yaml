@@ -9,7 +9,7 @@ esp8266:
 logger:
 
 ota:
-  password: !secret ota_pass
+  password: "8fd5374e68bff81e309da69b0b102ebf"
 
 wifi:
   ssid: !secret wifi_ssid
@@ -18,18 +18,18 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Krachmacher Fallback Hotspot"
-    password: !secrets ap_pass
+    password: "Gp4sfpJWpOfU"
 captive_portal:
 
 status_led:
   pin:
-    number: 2
+    number: RX
     inverted: True
 
 # Enable Home Assistant API
 api:
   encryption:
-      key: !secret encryption_key
+    key: "+p5LV+KTeHkISiXVReysu3dYTBbS6aqCDojCiEeDdXk="
   services:
     - service: ring_cymbal
       variables:
@@ -62,12 +62,16 @@ script:
     
 output:
   - platform: esp8266_pwm
-    pin: 1
+    pin:
+      number: 2
+      inverted: True
     id: cymbal
     frequency: 10Hz
 switch:
   - platform: gpio
-    pin: 3
+    pin:
+      number: 0
+      inverted: True
     name: "Spaceglocke"
     icon: "mdi:bell"
     id: bell
