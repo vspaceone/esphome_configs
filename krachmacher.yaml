@@ -1,0 +1,73 @@
+esphome:
+  name: krachmacher
+  friendly_name: krachmacher
+
+esp8266:
+  board: esp01_1m
+
+# Enable logging
+logger:
+
+ota:
+  password: !secret ota_pass
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Krachmacher Fallback Hotspot"
+    password: !secrets ap_pass
+captive_portal:
+
+status_led:
+  pin:
+    number: 2
+    inverted: True
+
+# Enable Home Assistant API
+api:
+  encryption:
+      key: !secret encryption_key
+  services:
+    - service: ring_cymbal
+      variables:
+        frequency_hz: int
+        duty_cycle: float
+        duration_ms: int
+      then:
+        - output.turn_on: cymbal
+        - output.set_level:
+            id: cymbal
+            level: !lambda "return duty_cycle;" 
+        - output.esp8266_pwm.set_frequency:
+            id: cymbal
+            frequency: !lambda "return frequency_hz;"
+        - lambda: "id(cymbal_off_delay_ms) = duration_ms;"
+        - script.execute: turn_off_cymbal
+
+globals:
+  - id: cymbal_off_delay_ms
+    type: int
+    restore_value: no
+    initial_value: '100'
+
+script:
+  - id: turn_off_cymbal
+    mode: restart
+    then:
+      - delay: !lambda "return id(cymbal_off_delay_ms);"
+      - output.turn_off: cymbal
+    
+output:
+  - platform: esp8266_pwm
+    pin: 1
+    id: cymbal
+    frequency: 10Hz
+switch:
+  - platform: gpio
+    pin: 3
+    name: "Spaceglocke"
+    icon: "mdi:bell"
+    id: bell
