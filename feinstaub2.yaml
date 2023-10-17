@@ -1,0 +1,42 @@
+esphome:
+  name: feinstaub2
+  friendly_name: feinstaub2
+
+esp32:
+  board: esp32-s2-saola-1 # actually repurposed development prototype
+  variant: esp32s2
+
+# Enable logging
+logger:
+  hardware_uart: UART1
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "VfX4uQdIFW79AyFQIJ12QYKF4N0wUgeE2d6kZE3wiCo="
+
+ota:
+  password: "c439a3074d497c8b47dcbe0211fed7cb"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Feinstaub2 Fallback Hotspot"
+    password: "f0BBwWJFaID1"
+
+captive_portal:
+
+status_led:
+  pin: 3
+
+uart:
+  rx_pin: 43
+  baud_rate: 9600
+
+sensor:
+  - platform: pm1006
+    pm_2_5:
+      name: "Feinstaub"
