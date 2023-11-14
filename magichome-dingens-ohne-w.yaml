@@ -37,28 +37,28 @@ light:
 output:
   - platform: esp8266_pwm
     id: r
-    frequency: 10000Hz
+    frequency: 30000Hz
     pin:
       inverted: false
       number: 5
   - platform: esp8266_pwm
     id: g
-    frequency: 10000Hz
+    frequency: 30000Hz
     pin:
       inverted: false
       number: 12
   - platform: esp8266_pwm
     id: b
-    frequency: 10000Hz
+    frequency: 30000Hz
     pin:
       inverted: false
       number: 13
-  - platform: esp8266_pwm
-    id: w
-    frequency: 10000Hz
-    pin:
-      inverted: false
-      number: 15
+#  - platform: esp8266_pwm
+#    id: w
+#    frequency: 30000Hz
+#    pin:
+#      inverted: false
+#      number: 15
 
 #remote_receiver:
 #  pin: 4
