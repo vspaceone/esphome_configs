@@ -1,0 +1,66 @@
+esphome:
+  name: magichome-dinger
+  friendly_name: magichome_dinger
+
+esp8266:
+  board: esp8285
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "UmmUfzmOY5uWAW5ZDLQ+7Yc+Lg52cjdJwSbxxz4H5Xw="
+
+ota:
+  password: "304e111ea5982a2240c1b715ba6cea7b"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Magichome-Dinger"
+    password: "eYyZ1BzICLzm"
+
+captive_portal:
+
+
+light:
+  - platform: rgbw
+    name: "MH RGBW Streifen"
+    red: r
+    green: g
+    blue: b
+    white: w
+
+output:
+  - platform: esp8266_pwm
+    id: r
+    frequency: 10000Hz
+    pin:
+      inverted: false
+      number: 5
+  - platform: esp8266_pwm
+    id: g
+    frequency: 10000Hz
+    pin:
+      inverted: false
+      number: 14
+  - platform: esp8266_pwm
+    id: b
+    frequency: 10000Hz
+    pin:
+      inverted: false
+      number: 12
+  - platform: esp8266_pwm
+    id: w
+    frequency: 10000Hz
+    pin:
+      inverted: false
+      number: 13
+
+#remote_receiver:
+#  pin: 4
