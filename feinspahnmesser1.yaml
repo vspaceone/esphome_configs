@@ -31,15 +31,29 @@ status_led:
   pin: 2
 
 uart:
-  rx_pin: 4
-  baud_rate: 9600
+  - rx_pin: 4
+    baud_rate: 9600
+    id: pm25uart
+  - rx_pin: GPIO17
+    tx_pin: GPIO21
+    baud_rate: 9600
+    id: co2uart
 
 i2c:
   sda: 25
   scl: 27
 
+
 sensor:
+  - platform: mhz19
+    uart_id: co2uart
+    co2:
+      name: "MH-Z19 CO2 Value"
+#    temperature:
+#      name: "MH-Z19 Temperature"
+    update_interval: 60s
   - platform: pm1006
+    uart_id: pm25uart
     pm_2_5:
       name: "Particulate Matter <2.5µm"
   - platform: aht10
