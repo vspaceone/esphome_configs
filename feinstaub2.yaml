@@ -8,7 +8,7 @@ esp32:
 
 # Enable logging
 logger:
-  hardware_uart: UART1
+  baud_rate: 0
 
 # Enable Home Assistant API
 api:
@@ -33,10 +33,30 @@ status_led:
   pin: 3
 
 uart:
-  rx_pin: 43
-  baud_rate: 9600
+  - rx_pin: 43
+    baud_rate: 9600
+    id: pm25uart
+  - rx_pin: 7
+    tx_pin: 6
+    baud_rate: 9600
+    id: co2uart
 
 sensor:
+  - platform: mhz19
+    uart_id: co2uart
+    co2:
+      name: "MH-Z19 CO2 Value"
+#    temperature:
+#      name: "MH-Z19 Temperature"
   - platform: pm1006
+    uart_id: pm25uart
     pm_2_5:
+      id: 
       name: "Feinstaub"
+  - platform: dht
+    pin: 5
+    model: DHT22
+    temperature:
+      name: "Temperatur"
+    humidity:
+      name: "Feuchte"
