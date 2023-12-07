@@ -1,0 +1,66 @@
+esphome:
+  name: luftsensor3
+  friendly_name: luftsensor3
+
+esp32:
+  board: esp32-s2-saola-1 # actually repurposed development prototype
+  variant: esp32s2
+
+# Enable logging
+logger:
+  baud_rate: 0
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "VfX4uQdIFW79AyFQIJ12QYKF4N0wUgeE2d6kZE3wiCo="
+
+ota:
+  password: "c439a3074d497c8b47dcbe0211fed7cb"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "luftsensor3 Fallback Hotspot"
+    password: "f0BBwWJFaID1"
+
+captive_portal:
+
+status_led:
+  pin:
+    number: 3
+    inverted: true
+
+uart:
+  - rx_pin: 5
+    tx_pin: 7
+    baud_rate: 9600
+    id: co2uart
+
+i2c:
+  scl: 43
+  sda: 9
+
+sensor:
+  - platform: mhz19
+    uart_id: co2uart
+    co2:
+      name: "CO2"
+      id: actual_co2
+  - platform: ccs811
+    tvoc:
+      name: "TVOC"
+      id: tvoc
+    eco2:
+      id: estimated_co2
+    address: 0x5A
+  - platform: hdc1080
+    temperature:
+      name: "Temperatur"
+      id: temp
+    humidity:
+      name: "Feuchte"
+      id: hum
