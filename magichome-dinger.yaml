@@ -35,6 +35,22 @@ light:
     green: g
     blue: b
     white: w
+    effects:
+      - lambda:
+          name: Slow Rainbow
+          update_interval: 1s
+          lambda: |-
+            const float cycle_time = 12;
+            auto call = id(strip).turn_on();
+            call.set_publish(false);
+            call.set_save(false);
+            call.set_transition_length(1000);
+            float t = fmod((3 * millis())/(cycle_time * 1000), 3);
+            float i = fmod(t,1);
+            if (0 <= t && t <= 1) call.set_rgb(i, 0, 1-i);
+            else if (1 <= t && t <= 2) call.set_rgb(1-i, i, 0);
+            else if (2 <= t && t <= 3) call.set_rgb(0, 1-i, i);
+            call.perform();
 
 output:
   - platform: esp8266_pwm
