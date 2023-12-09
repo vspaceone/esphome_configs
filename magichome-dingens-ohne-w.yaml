@@ -33,6 +33,7 @@ light:
     red: r
     green: g
     blue: b
+    id: strip
     effects:
       - lambda:
           name: Slow Rainbow
