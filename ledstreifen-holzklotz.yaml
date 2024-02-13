@@ -1,0 +1,79 @@
+esphome:
+  name: ledstreifen-holzklotz
+  friendly_name: ledstreifen_holzklotz
+
+esp32:
+  board: esp32-s2-saola-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "lIuGugE9HUrO/bV5u4obhlNWloA4PZR8NPmqbOWBicg="
+
+ota:
+  password: "b6b51aff08747dfa848a5cff3f7e2925"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Ledstreifen-Holzklotz"
+    password: "nGdzuMiLEVmZ"
+
+captive_portal:
+
+status_led:
+  pin:
+    number: 3
+    inverted: True
+
+light:
+  - platform: rgb
+    name: "Lichtstreifen Holzklotz"
+    red: r
+    green: g
+    blue: b
+    id: strip
+    effects:
+      - lambda:
+          name: Slow Rainbow
+          update_interval: 1s
+          lambda: |-
+            const float cycle_time = 12;
+            auto call = id(strip).turn_on();
+            call.set_publish(false);
+            call.set_save(false);
+            call.set_transition_length(1000);
+            float t = fmod((3 * millis())/(cycle_time * 1000), 3);
+            float i = fmod(t,1);
+            if (0 <= t && t <= 1) call.set_rgb(i, 0, 1-i);
+            else if (1 <= t && t <= 2) call.set_rgb(1-i, i, 0);
+            else if (2 <= t && t <= 3) call.set_rgb(0, 1-i, i);
+            call.perform();
+
+output:
+  - platform: ledc
+    id: g
+    frequency: 9765Hz
+    pin:
+      number: 5
+      inverted: True
+  - platform: ledc
+    id: r
+    frequency: 9765Hz
+    pin:
+      number: 43
+      inverted: True
+  - platform: ledc
+    id: b
+    frequency: 9765Hz
+    pin:
+      number: 9
+      inverted: False
