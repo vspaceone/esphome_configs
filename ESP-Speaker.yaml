@@ -1,0 +1,52 @@
+esphome:
+  name: esp_speaker
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  password: "speak"
+
+wifi:
+  ssid: "vspace.one"
+  password: "12345678"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "ESPhome Speaker"
+    password: "Bz6wWFdn5ISY"
+
+captive_portal:
+
+i2s_audio:
+  i2s_lrclk_pin: GPIO27
+  i2s_bclk_pin: GPIO16
+
+media_player:
+  - platform: i2s_audio
+    name: ESPHome Speaker
+    dac_type: external
+    mode: mono
+    i2s_dout_pin: GPIO25
+    mute_pin:
+      number: 17
+      inverted: true
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 18
+      inverted: true
+      mode: INPUT_PULLUP
+    name: "ESPHome Speaker Button"
+    filters:
+      - delayed_on: 10ms
