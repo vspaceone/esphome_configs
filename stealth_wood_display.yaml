@@ -32,20 +32,34 @@ api:
     then:
       - lambda: |-
           char* txt_ptr = id(disp_txt);
-          strncpy(txt_ptr, txt.c_str(), sizeof(id(disp_txt))-1);
+          const size_t dest_size = sizeof(id(disp_txt))-9;
+          strncpy(txt_ptr, txt.c_str(), dest_size);
+          strcat(txt_ptr, "        ");
       - logger.log:
          format: "New text to display: %s"
          args: [ 'id(disp_txt)' ]
       - component.update: mtx_disp
 
 ota:
+#  on_progress: 
+#    then:
+#      - lambda: 
+#         id(mtx_disp).printf(0, -4, id(OpenMine_17_font), "OTA %03.1f%%", x);
+#  on_end:
+#    then:
+#      - lambda: 
+#         id(mtx_disp).print(0, -4, id(OpenMine_17_font), "OTA done :)");
+#  on_error:
+#    then:
+#      - lambda: 
+#         id(mtx_disp).print(0, -4, id(OpenMine_17_font), "OTA ERROR X_X");
 
 globals:
   - id: disp_txt
     type: char[1024]
     restore_value: False
     initial_value: |-
-      {'v','s','p','a','c','e','.','o','n','e'}
+      {'v','s','p','a','c','e','.','o','n','e',0}
 
 status_led:
   pin:
@@ -63,12 +77,13 @@ display:
     cs_pin: D1
     num_chips: 8
     intensity: 15
-    scroll_speed: 100ms
-    scroll_delay: 500ms
+    scroll_speed: 50ms
+    scroll_delay: 250ms
     update_interval: never
     lambda: |-
       const char* txt_ptr = id(disp_txt);
-      id(mtx_disp).print(0, -3, id(OpenMine_17_font), txt_ptr);
+      it.clear();
+      it.print(0, -4, id(OpenMine_17_font), txt_ptr);
 
 font:
   - file: "OpenMine.ttf"
