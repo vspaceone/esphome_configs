@@ -44,6 +44,8 @@ globals:
   - id: disp_txt
     type: char[1024]
     restore_value: False
+    initial_value: |-
+      {'v','s','p','a','c','e','.','o','n','e'}
 
 status_led:
   pin:
@@ -53,20 +55,20 @@ status_led:
 # Example configuration entry
 spi:
   clk_pin: D0
-  mosi_pin: D1
+  mosi_pin: D2
 
 display:
   - platform: max7219digit
     id: mtx_disp
-    cs_pin: D2
-    num_chips: 4
-    intensity: 7
+    cs_pin: D1
+    num_chips: 8
+    intensity: 15
     scroll_speed: 100ms
     scroll_delay: 500ms
     update_interval: never
     lambda: |-
       const char* txt_ptr = id(disp_txt);
-      id(mtx_disp).print(0,-3,id(OpenMine_17_font),txt_ptr);
+      id(mtx_disp).print(0, -3, id(OpenMine_17_font), txt_ptr);
 
 font:
   - file: "OpenMine.ttf"
