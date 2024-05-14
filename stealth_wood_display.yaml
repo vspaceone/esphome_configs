@@ -5,34 +5,31 @@ esphome:
   name: ledmatrixdisplay
   platform: ESP8266
   board: nodemcuv2
- 
+
 wifi:
-  networks:
-    - ssid: "vspace.one"
-      password: "12345678"
-    - ssid: "BLANK"
-      password: "BLANK"
- 
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Ledmatrixdisplay"
-    password: "BLANK"
- 
+    password: "iw3jEjew493VBmk5"
+
 captive_portal:
- 
+
 # Enable logging
 logger:
- 
+
 # Enable Home Assistant API
 api:
- 
+
 ota:
- 
+
 # Example configuration entry
 spi:
   clk_pin: D0
   mosi_pin: D1
- 
+
 display:
   - platform: max7219digit
     cs_pin: D2
@@ -41,11 +38,11 @@ display:
     scroll_speed: 100ms
     scroll_delay: 0s
     lambda: |-
-      if (id(light_behind_wood).state > 4.9) 
+      if (id(light_behind_wood).state > 4.9)
       {
         it.intensity(15);
-      } 
-      else if (id(light_behind_wood).state > 0.7) 
+      }
+      else if (id(light_behind_wood).state > 0.7)
       {
         it.intensity(10);
       }
@@ -54,12 +51,12 @@ display:
         it.intensity(5);
       }
       it.printf(0, -3, id(OpenMine_17_font), " O %.1f L %.1f B %.1f", id(temperature_outside).state,id(temperature_livingroom).state,id(temperature_bedroom).state);
- 
+
 font:
   - file: "OpenMine.ttf"
     id: OpenMine_17_font
     size: 17
- 
+
 sensor:
   # Outside temperature
   - platform: homeassistant
