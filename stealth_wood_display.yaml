@@ -5,6 +5,9 @@ esphome:
   name: ledmatrixdisplay
   platform: ESP8266
   board: nodemcuv2
+  on_boot: 
+    then:
+      - component.update: mtx_disp
 
 wifi:
   ssid: !secret wifi_ssid
@@ -22,8 +25,30 @@ logger:
 
 # Enable Home Assistant API
 api:
+  services:
+  - service: show_message
+    variables:
+      txt: string
+    then:
+      - lambda: |-
+          char* txt_ptr = id(disp_txt);
+          strncpy(txt_ptr, txt.c_str(), sizeof(id(disp_txt))-1);
+      - logger.log:
+         format: "New text to display: %s"
+         args: [ 'id(disp_txt)' ]
+      - component.update: mtx_disp
 
 ota:
+
+globals:
+  - id: disp_txt
+    type: char[1024]
+    restore_value: False
+
+status_led:
+  pin:
+    number: D5
+    inverted: True
 
 # Example configuration entry
 spi:
@@ -32,25 +57,16 @@ spi:
 
 display:
   - platform: max7219digit
+    id: mtx_disp
     cs_pin: D2
     num_chips: 4
     intensity: 7
     scroll_speed: 100ms
-    scroll_delay: 0s
+    scroll_delay: 500ms
+    update_interval: never
     lambda: |-
-      if (id(light_behind_wood).state > 4.9)
-      {
-        it.intensity(15);
-      }
-      else if (id(light_behind_wood).state > 0.7)
-      {
-        it.intensity(10);
-      }
-      else
-      {
-        it.intensity(5);
-      }
-      it.printf(0, -3, id(OpenMine_17_font), " O %.1f L %.1f B %.1f", id(temperature_outside).state,id(temperature_livingroom).state,id(temperature_bedroom).state);
+      const char* txt_ptr = id(disp_txt);
+      id(mtx_disp).print(0,-3,id(OpenMine_17_font),txt_ptr);
 
 font:
   - file: "OpenMine.ttf"
@@ -58,32 +74,22 @@ font:
     size: 17
 
 sensor:
-  # Outside temperature
-  - platform: homeassistant
-    id: temperature_outside
-    entity_id: sensor.temperature_10
-  # Livingroom temperature
-  - platform: homeassistant
-    id: temperature_livingroom
-    entity_id: sensor.atmos_livingroom
-  # Bedroom temperature
-  - platform: homeassistant
-    id: temperature_bedroom
-    entity_id: sensor.atmos_bedroom
   # Lightsensor Behind Wood
   - platform: bh1750
     id: light_behind_wood
     name: "Light Behind Wood"
     address: 0x5C
-    measurement_time: 69
     update_interval: 60s
     # Lightsensor Room
   - platform: bh1750
     id: light_room
     name: "Light Room"
     address: 0x23
-    measurement_time: 69
     update_interval: 60s
+    on_value:
+      lambda: |-
+        if (x > 0) id(mtx_disp).intensity(std::clamp( x*3 ,float(1),float(15)));
+        else id(mtx_disp).intensity(15);
 
 i2c:
   sda: D3
