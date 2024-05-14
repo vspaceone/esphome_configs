@@ -29,6 +29,13 @@ Color trans_flag[] = {
     Color(0,255,255)
 };
 
+Color enby_flag[] = {
+    Color(255,255,0),
+    Color(255,255,255),
+    Color(192,0,255),
+    Color(24,24,24)
+};
+
 void pride_circle(AddressableLight& it, const Color* flag, uint8_t flag_len) {
     uint16_t len = it.size();
     double leds_per_band = ((double)len/2.0) / (double)flag_len;

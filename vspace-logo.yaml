@@ -75,6 +75,9 @@ light:
           name: "Traaa"
           lambda: "pride_circle(it, trans_flag,5);"
       - addressable_lambda:
+          name: "Enby"
+          lambda: "pride_circle(it, enby_flag,4);"
+      - addressable_lambda:
           name: "Sine"
           update_interval: 10ms
           lambda: |-
@@ -101,6 +104,9 @@ light:
       - addressable_lambda:
           name: "Traaa"
           lambda: "pride_circle(it, trans_flag,5);"
+      - addressable_lambda:
+          name: "Enby"
+          lambda: "pride_circle(it, enby_flag,4);"
       - addressable_lambda:
           name: "Sine"
           update_interval: 10ms
