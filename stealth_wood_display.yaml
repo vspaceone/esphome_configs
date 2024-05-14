@@ -38,10 +38,10 @@ api:
           else id(disp_duration) = 300;
           //txt
           char* txt_ptr = id(disp_txt);
-          const size_t dest_size = sizeof(id(disp_txt))-9;
+          const size_t dest_size = sizeof(id(disp_txt))-4;
           strncpy(txt_ptr, txt.c_str(), dest_size);
           txt_ptr = id(disp_txt);
-          strcat(txt_ptr, "        ");
+          strcat(txt_ptr, " . ");
       - logger.log:
          format: "New text to display for %d seconds: %s"
          args: [ 'id(disp_duration)', 'id(disp_txt)' ]
