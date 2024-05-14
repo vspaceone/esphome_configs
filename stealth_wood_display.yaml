@@ -5,7 +5,8 @@ esphome:
   name: ledmatrixdisplay
   platform: ESP8266
   board: nodemcuv2
-  on_boot: 
+  on_boot:
+    priority: 1000
     then:
       - component.update: mtx_disp
 
@@ -29,18 +30,31 @@ api:
   - service: show_message
     variables:
       txt: string
+      duration: int
     then:
       - lambda: |-
+          //duration
+          if (id(disp_duration)>0) id(disp_duration) = duration;
+          else id(disp_duration) = 300;
+          //txt
           char* txt_ptr = id(disp_txt);
           const size_t dest_size = sizeof(id(disp_txt))-9;
           strncpy(txt_ptr, txt.c_str(), dest_size);
+          txt_ptr = id(disp_txt);
           strcat(txt_ptr, "        ");
       - logger.log:
-         format: "New text to display: %s"
-         args: [ 'id(disp_txt)' ]
+         format: "New text to display for %d seconds: %s"
+         args: [ 'id(disp_duration)', 'id(disp_txt)' ]
       - component.update: mtx_disp
+      - script.execute: clear_disp_timeout
 
 ota:
+  on_begin: 
+    then:
+      - lambda: |-
+          char* txt_ptr = id(disp_txt);
+          strcpy(txt_ptr, "OTA...");
+      - component.update: mtx_disp
 #  on_progress: 
 #    then:
 #      - lambda: 
@@ -60,16 +74,33 @@ globals:
     restore_value: False
     initial_value: |-
       {'v','s','p','a','c','e','.','o','n','e',0}
+  - id: disp_duration
+    type: int32_t
+    restore_value: False
+    initial_value: "300"
 
 status_led:
   pin:
     number: D5
     inverted: True
 
-# Example configuration entry
+script:
+  - id: clear_disp_timeout
+    mode: restart
+    then: 
+      - delay: !lambda "return uint32_t(id(disp_duration)) * 1000;"
+      - lambda: |-
+          char* txt_ptr = id(disp_txt);
+          strcpy(txt_ptr, "vspace.one");
+      - component.update: mtx_disp
+
 spi:
   clk_pin: D0
   mosi_pin: D2
+
+time:
+  - platform: homeassistant
+    id: ha_time
 
 display:
   - platform: max7219digit
