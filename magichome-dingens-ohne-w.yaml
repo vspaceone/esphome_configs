@@ -16,6 +16,11 @@ api:
 ota:
   password: "63fa32a6729a47c8b7ad2d9f171e4efa"
 
+
+web_server:
+  ota: False
+  local: True
+
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password

@@ -37,6 +37,10 @@ ota:
 #status_led:
 #  pin: GPIO2
 
+web_server:
+  ota: False
+  local: True
+
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
