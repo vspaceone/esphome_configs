@@ -9,6 +9,7 @@ esp8266:
 logger:
 
 ota:
+  platform: esphome
   password: "8fd5374e68bff81e309da69b0b102ebf"
 
 wifi:

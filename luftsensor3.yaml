@@ -16,6 +16,7 @@ api:
     key: "VfX4uQdIFW79AyFQIJ12QYKF4N0wUgeE2d6kZE3wiCo="
 
 ota:
+  platform: esphome
   password: "c439a3074d497c8b47dcbe0211fed7cb"
 
 wifi:
@@ -57,10 +58,15 @@ sensor:
     eco2:
       id: estimated_co2
     address: 0x5A
-  - platform: hdc1080
+  - platform: aht10
     temperature:
       name: "Temperatur"
-      id: temp
     humidity:
       name: "Feuchte"
+  - platform: hdc1080
+    temperature:
+      name: "Temperatur Shitty"
+      id: temp
+    humidity:
+      name: "Feuchte Shitty"
       id: hum

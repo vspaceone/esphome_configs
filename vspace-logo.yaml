@@ -32,6 +32,7 @@ api:
     key: "+p5LV+KTeHkISiXVReysu3dYTBbS6aqCDojCiEeDdXk="
 
 ota:
+  platform: esphome
   password: "8fd5374e68bff81e309da69b0b102ebf"
 
 #status_led:

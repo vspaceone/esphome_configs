@@ -49,6 +49,7 @@ api:
       - script.execute: clear_disp_timeout
 
 ota:
+  platform: esphome
   on_begin: 
     then:
       - lambda: |-
