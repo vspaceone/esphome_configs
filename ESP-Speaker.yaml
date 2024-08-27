@@ -18,8 +18,8 @@ ota:
   password: "speak"
 
 wifi:
-  ssid: "vspace.one"
-  password: "12345678"
+  ssid: "vspace.one IoT WiFi"
+  password: "5Q55YQ4WHnEwkZuXwbANJxXk;"
   power_save_mode: none
   fast_connect: true
 
