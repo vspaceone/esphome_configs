@@ -48,6 +48,9 @@ api:
       - component.update: mtx_disp
       - script.execute: clear_disp_timeout
 
+mqtt:
+  broker: mqtt.int.vspace.one
+
 ota:
   platform: esphome
   on_begin: 

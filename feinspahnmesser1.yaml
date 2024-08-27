@@ -13,6 +13,9 @@ logger:
 # Enable Home Assistant API
 api:
 
+mqtt:
+  broker: mqtt.int.vspace.one
+
 ota:
   platform: esphome
   password: "65f694d9321b6163cfdd922829b40a15"

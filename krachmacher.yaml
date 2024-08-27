@@ -48,6 +48,9 @@ api:
         - lambda: "id(cymbal_off_delay_ms) = duration_ms;"
         - script.execute: turn_off_cymbal
 
+mqtt:
+  broker: mqtt.int.vspace.one
+
 globals:
   - id: cymbal_off_delay_ms
     type: int

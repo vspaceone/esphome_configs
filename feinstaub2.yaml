@@ -15,6 +15,9 @@ api:
   encryption:
     key: "VfX4uQdIFW79AyFQIJ12QYKF4N0wUgeE2d6kZE3wiCo="
 
+mqtt:
+  broker: mqtt.int.vspace.one
+
 ota:
   platform: esphome
   password: "c439a3074d497c8b47dcbe0211fed7cb"
