@@ -30,8 +30,6 @@ wifi:
     gateway: 10.0.8.1
     dns1: 10.0.8.1
     dns2: 1.1.1.1
-  
-  use_address: 10.0.8.88
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
