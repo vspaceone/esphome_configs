@@ -51,10 +51,10 @@ media_player:
     mute_pin:
       number: 17
       inverted: true
-    on_pause:
-      button.press: device_restart
-    on_idle:
-      button.press: device_restart
+    #on_pause:
+    #  button.press: device_restart
+    #on_idle:
+    #  button.press: device_restart
 
 button:
   - platform: restart
