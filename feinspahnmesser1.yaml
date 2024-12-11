@@ -73,5 +73,15 @@ sensor:
     humidity:
       name: "Feinspahnmesser 1 Feuchte"
 
+esp32_ble_tracker:
+
 bluetooth_proxy:
   active: False
+
+esp32_ble_beacon:
+  type: iBeacon
+  uuid: '170841a7-826a-c250-30cf-bbd8c91a8eb5'
+  major: 1337
+  minor: 20
+  tx_power: 9dBm
+  measured_power: -90
