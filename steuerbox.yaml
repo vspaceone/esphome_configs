@@ -40,12 +40,15 @@ status_led:
 
 http_request:
   verify_ssl: false
+  esp8266_disable_ssl_support: true
 script:
   - id: rundumlicht_toggle_script
     then:
       - http_request.post:
           url: "http://10.0.8.12/switch/rundumlicht/toggle"
           capture_response: True
+          headers:
+            Authorization: "Basic cmVtb3RlX2N0bDpNSVZNVVFSUjJIUkI3WE9EVUNIUzJCWVFJQ01OTlkzWTU2QkhWSjZGTzRKRlJPWEpDWE9XSFRCVlI0Q1pYUEZHR1U2UVQ0VjZUTVlR" #"Basic " + btoa("remote_ctl"+":"+"MIVMUQRR2HRB7XODUCHS2BYQICMNNY3Y56BHVJ6FO4JFROXJCXOWHTBVR4CZXPFGGU6QT4V6TMYQ")
           on_response:
             then:
               lambda: |-
@@ -120,6 +123,13 @@ light:
     - id: button_leds
       from: 0
       to: 0
+    effects:
+      - pulse:
+          name: "blink"
+          transition_length: 0.1s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
   - platform: partition
     id: rundumlicht_led
     disabled_by_default: True
@@ -130,3 +140,10 @@ light:
     - id: button_leds
       from: 1
       to: 1
+    effects:
+      - pulse:
+          name: "blink"
+          transition_length: 0.1s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
