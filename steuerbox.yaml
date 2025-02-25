@@ -83,7 +83,7 @@ light:
   - platform: partition
     id: rundumlicht_led
     disabled_by_default: True
-    name: "Steuerbox Space-State LED"
+    name: "Steuerbox Rundumlicht LED"
     icon: "mdi:led-off"
     segments:
     - id: button_leds
