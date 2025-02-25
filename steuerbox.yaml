@@ -37,6 +37,43 @@ captive_portal:
 status_led:
   pin: 2
 
+
+http_request:
+  verify_ssl: false
+script:
+  - id: rundumlicht_toggle_script
+    then:
+      - http_request.post:
+          url: "http://10.0.8.12/switch/rundumlicht/toggle"
+          capture_response: True
+          on_response:
+            then:
+              lambda: |-
+                auto call = id(rundumlicht_led).turn_on();
+                call.set_transition_length(100);
+                call.set_rgb(1.0,0.8,0.0); //default error color
+                if (response->status_code == 200) json::parse_json(body, [](JsonObject root) -> bool {
+                  if (root["value"]) {
+                    if (root["value"]) call.set_rgb(1.0,0.0,0.5);;
+                    else call.set_rgb(1.0,0.0,0.5);
+                    return true;
+                  }
+                  else {
+                    ESP_LOGI(TAG,"No 'value' key in this json!");
+                    return false;
+                  }
+                });
+                call.perform();
+          on_error:
+            then:
+              light.turn_on:
+                id: rundumlicht_led
+                red: 100%
+                green: 75%
+                blue: 0%
+                effect: "blink"
+
+
 binary_sensor:
   - platform: status
     id: is_online
@@ -55,6 +92,8 @@ binary_sensor:
   - platform: gpio
     id: rundumlicht_btn
     name: "Steuerbox Rundumlicht Toggle Button"
+    disabled_by_default: True
+    entity_category: DIAGNOSTIC
     pin:
       number: GPIO5
       inverted: True
@@ -73,7 +112,8 @@ light:
     num_leds: 2
   - platform: partition
     id: space_state_led
-    disabled_by_default: True
+    disabled_by_default: False
+    entity_category: CONFIG
     name: "Steuerbox Space-State LED"
     icon: "mdi:led-off"
     segments:
@@ -83,6 +123,7 @@ light:
   - platform: partition
     id: rundumlicht_led
     disabled_by_default: True
+    entity_category: DIAGNOSTIC
     name: "Steuerbox Rundumlicht LED"
     icon: "mdi:led-off"
     segments:
