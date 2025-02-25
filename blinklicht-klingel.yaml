@@ -50,3 +50,10 @@ binary_sensor:
     id: button
   - platform: status
     name: "Klingel online"
+
+switch:
+  - platform: gpio
+    pin:
+      number:
+    name: "Rundumlicht"
+    icon: "mdi:alarm-light"
