@@ -38,6 +38,9 @@ status_led:
   pin: 2
 
 binary_sensor:
+  - platform: status
+    id: is_online
+    name: "Steuerbox Online"
   - platform: gpio
     id: space_state_btn
     name: "Steuerbox Space-State Toggle Button"
@@ -47,6 +50,8 @@ binary_sensor:
       mode:
         input: True
         pullup: True
+    filters:
+      - settle: 100ms
   - platform: gpio
     id: rundumlicht_btn
     name: "Steuerbox Rundumlicht Toggle Button"
@@ -56,49 +61,31 @@ binary_sensor:
       mode:
         input: True
         pullup: True
+    filters:
+      - settle: 100ms
 
-sn74hc595:
-  - id: 'pixtxa_pcb' #see https://wiki.vspace.one/doku.php?id=projekte:2023:1D-Pong#beacon-ansteuerung
-    data_pin: GPIO12
-    clock_pin: GPIO13
-    latch_pin: GPIO14
-    oe_pin: GPIO15
-    sr_count: 1
-
-output:
-  - platform: gpio
-    id: space_state_red
-    pin:
-      sn74hc595: pixtxa_pcb
-      number: 0
-      inverted: True
-  - platform: gpio
-    id: space_state_green
-    pin:
-      sn74hc595: pixtxa_pcb
-      number: 1
-      inverted: True
-  - platform: gpio
-    id: space_state_blue
-    pin:
-      sn74hc595: pixtxa_pcb
-      number: 2
-      inverted: True
-  - platform: gpio
-    id: rundumlicht_red
-    pin:
-      sn74hc595: pixtxa_pcb
-      number: 4
-      inverted: True
-  - platform: gpio
-    id: rundumlicht_green
-    pin:
-      sn74hc595: pixtxa_pcb
-      number: 5
-      inverted: True
-  - platform: gpio
-    id: rundumlicht_blue
-    pin:
-      sn74hc595: pixtxa_pcb
-      number: 6
-      inverted: True
+light:
+  - platform: neopixelbus
+    id: button_leds
+    type: GRB
+    variant: WS2811
+    pin: GPIO12
+    num_leds: 2
+  - platform: partition
+    id: space_state_led
+    disabled_by_default: True
+    name: "Steuerbox Space-State LED"
+    icon: "mdi:led-off"
+    segments:
+    - id: button_leds
+      from: 0
+      to: 0
+  - platform: partition
+    id: rundumlicht_led
+    disabled_by_default: True
+    name: "Steuerbox Space-State LED"
+    icon: "mdi:led-off"
+    segments:
+    - id: button_leds
+      from: 1
+      to: 1
