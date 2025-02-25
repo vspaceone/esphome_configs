@@ -1,0 +1,104 @@
+#Controller for two buttons in the vspace.one central control-box
+#Buttons can be pressed tempoarily and can output 1bit RGB colors
+
+esphome:
+  name: steuerbox
+  friendly_name: "Steuerbox"
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "swDbwNjheWgw62851e4iOvNVaPVWVC8re78cTuBmQiU="
+
+mqtt:
+  broker: mqtt.int.vspace.one
+
+ota:
+  - platform: esphome
+    password: "2854835fd37f3038507488080261d22c"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Steuerbox Fallback Hotspot"
+    password: "7pMF0Sb2jEaE"
+
+captive_portal:
+
+status_led:
+  pin: 2
+
+binary_sensor:
+  - platform: gpio
+    id: space_state_btn
+    name: "Steuerbox Space-State Toggle Button"
+    pin:
+      number: GPIO4
+      inverted: True
+      mode:
+        input: True
+        pullup: True
+  - platform: gpio
+    id: rundumlicht_btn
+    name: "Steuerbox Rundumlicht Toggle Button"
+    pin:
+      number: GPIO5
+      inverted: True
+      mode:
+        input: True
+        pullup: True
+
+sn74hc595:
+  - id: 'pixtxa_pcb' #see https://wiki.vspace.one/doku.php?id=projekte:2023:1D-Pong#beacon-ansteuerung
+    data_pin: GPIO12
+    clock_pin: GPIO13
+    latch_pin: GPIO14
+    oe_pin: GPIO15
+    sr_count: 1
+
+output:
+  - platform: gpio
+    id: space_state_red
+    pin:
+      sn74hc595: pixtxa_pcb
+      number: 0
+      inverted: True
+  - platform: gpio
+    id: space_state_green
+    pin:
+      sn74hc595: pixtxa_pcb
+      number: 1
+      inverted: True
+  - platform: gpio
+    id: space_state_blue
+    pin:
+      sn74hc595: pixtxa_pcb
+      number: 2
+      inverted: True
+  - platform: gpio
+    id: rundumlicht_red
+    pin:
+      sn74hc595: pixtxa_pcb
+      number: 4
+      inverted: True
+  - platform: gpio
+    id: rundumlicht_green
+    pin:
+      sn74hc595: pixtxa_pcb
+      number: 5
+      inverted: True
+  - platform: gpio
+    id: rundumlicht_blue
+    pin:
+      sn74hc595: pixtxa_pcb
+      number: 6
+      inverted: True
