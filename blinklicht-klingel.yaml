@@ -58,10 +58,3 @@ switch:
     name: "Rundumlicht"
     id: "rundumlicht"
     icon: "mdi:alarm-light"
-
-web_server:
-  local: True
-  ota: False
-  auth: 
-    username: remote_ctl
-    password: "MIVMUQRR2HRB7XODUCHS2BYQICMNNY3Y56BHVJ6FO4JFROXJCXOWHTBVR4CZXPFGGU6QT4V6TMYQ"

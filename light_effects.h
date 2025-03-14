@@ -55,3 +55,19 @@ void sine_effect(AddressableLight& it, Color col) {
 	uint16_t len = it.size();
 	for (uint16_t i = 0; i < len; i++) it[i].set_green( 127 * (std::sin( i*(two_pi/float(len-1.0)) +m) +1.0) );
 }
+
+
+void ha_state_to_led(std::string ha_state, AddressableLightState*& led) {
+    std::map<std::string,Color> state_to_color {
+        {"on",Color(0,255,0)}, //green for on
+        {"off",Color(255,0,128)}, //puple for  off (red-green blindness accessibility)
+        {"unknown",Color(255,192,0)}, //yellow for unknown
+        {"unavailable",Color(255,64,0)} //red for unavailable
+    };
+    Color c = Color(255,255,255); 
+    if (state_to_color.find(ha_state) != state_to_color.end()) c = state_to_color[ha_state]; //color found
+    auto call = led->turn_on();
+    call.set_rgb(c.red,c.green,c.blue);
+    if (ha_state == "unavailable")call.set_effect("blink");
+    call.perform();
+}
