@@ -50,7 +50,7 @@ captive_portal:
 status_led:
   pin: 2
 
-####
+
 switch:
   - platform: homeassistant
     id: ha_space_state_switch
@@ -74,7 +74,6 @@ text_sensor:
     on_value: 
       then:
         lambda: "ha_state_to_led(x,id(space_state_led));"
-####
 
 binary_sensor:
   - platform: status
@@ -94,7 +93,13 @@ binary_sensor:
       - settle: 250ms
     on_press: 
       then:
-        - switch.toggle: ha_space_state_switch
+        - light.turn_on: #indicate command received
+            id: rundumlicht_led
+            red: 100%
+            green: 100%
+            blue: 100%
+            brightness: 25%
+        - switch.toggle: ha_space_state_switch #send command
   - platform: gpio
     id: rundumlicht_btn
     name: "Steuerbox Rundumlicht Toggle Button"
@@ -109,7 +114,13 @@ binary_sensor:
       - settle: 250ms
     on_press: 
       then:
-        - switch.toggle: ha_rundumlicht_switch
+        - light.turn_on: #indicate command received
+            id: rundumlicht_led
+            red: 100%
+            green: 100%
+            blue: 100%
+            brightness: 25%
+        - switch.toggle: ha_rundumlicht_switch #send command
 
 light:
   - platform: neopixelbus
