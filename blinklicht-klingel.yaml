@@ -54,7 +54,7 @@ binary_sensor:
 switch:
   - platform: gpio
     pin:
-      number:
+      number: 43
     name: "Rundumlicht"
     id: "rundumlicht"
     icon: "mdi:alarm-light"
