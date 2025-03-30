@@ -1,0 +1,59 @@
+esphome:
+  name: supermini-btproxy-brucke
+  friendly_name: "ESP-C3-SuperMini BT-Proxy Brücke"
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "pJqOs93Tw5uNiEDJK6jWFBgRSnewj/PJNyffidbsdVE="
+
+ota:
+  - platform: esphome
+    password: "d532150c94a712a1d77a3db4e0adc89f"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  manual_ip: 
+    static_ip: 10.0.8.31
+    subnet: 255.255.252.0
+    gateway: 10.0.8.1
+    dns1: 10.0.8.1
+    dns2: 1.1.1.1
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esp-C3-Supermini-Bt-Proxy"
+    password: "DKVDdOOhRXx7"
+
+captive_portal:
+
+status_led:
+  pin: 8
+
+improv_serial:
+
+esp32_improv:
+  authorizer: btn
+
+bluetooth_proxy:
+  active: True
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 0
+      inverted: True
+      mode: 
+        pullup: True
+        input: True
+    id: btn
