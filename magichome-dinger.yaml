@@ -95,3 +95,8 @@ output:
 
 #remote_receiver:
 #  pin: 4
+
+binary_sensor:
+  - platform: status
+    name: "Online"
+    id: online

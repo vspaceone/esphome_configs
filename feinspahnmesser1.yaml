@@ -85,3 +85,8 @@ esp32_ble_beacon:
   minor: 20
   tx_power: 9dBm
   measured_power: -90
+
+binary_sensor:
+  - platform: status
+    name: "Online"
+    id: online

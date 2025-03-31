@@ -80,3 +80,8 @@ sensor:
     humidity:
       name: "Feuchte Shitty"
       id: hum
+
+binary_sensor:
+  - platform: status
+    name: "Online"
+    id: online

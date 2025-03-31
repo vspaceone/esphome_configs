@@ -70,3 +70,7 @@ binary_sensor:
     name: "ESPHome Speaker Button"
     filters:
       - delayed_on: 10ms
+
+  - platform: status
+    name: "Online"
+    id: online

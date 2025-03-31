@@ -81,3 +81,8 @@ output:
     pin:
       number: RX
       inverted: False
+
+binary_sensor:
+  - platform: status
+    name: "Online"
+    id: online

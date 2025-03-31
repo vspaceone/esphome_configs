@@ -71,3 +71,8 @@ sensor:
       name: "Temperatur"
     humidity:
       name: "Feuchte"
+
+binary_sensor:
+  - platform: status
+    name: "Online"
+    id: online

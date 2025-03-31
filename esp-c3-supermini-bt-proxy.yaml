@@ -57,3 +57,7 @@ binary_sensor:
         pullup: True
         input: True
     id: btn
+
+  - platform: status
+    name: "Online"
+    id: online
