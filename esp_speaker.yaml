@@ -4,7 +4,7 @@ esphome:
 esp32:
   board: wemos_d1_mini32
   framework:
-    type: arduino
+    type: esp-idf
 
 # Enable logging
 logger:
@@ -42,19 +42,54 @@ i2s_audio:
   i2s_lrclk_pin: GPIO27
   i2s_bclk_pin: GPIO16
 
+
 media_player:
-  - platform: i2s_audio
+  - platform: speaker
+    id: mp
+    announcement_pipeline:
+      speaker: spk
+      format: WAV
+      sample_rate: 16000
+      num_channels: 1
+    #media_pipeline:
+    #  speaker: spk_media
+    #  format: WAV
+    #  sample_rate: 32000
+    #  num_channels: 1
+    codec_support_enabled: false
     name: ESPHome Speaker
-    dac_type: external
-    mode: mono
-    i2s_dout_pin: GPIO25
-    mute_pin:
-      number: 17
-      inverted: true
+    buffer_size: 32000
     #on_pause:
     #  button.press: device_restart
     #on_idle:
     #  button.press: device_restart
+    on_idle:
+      - output.turn_on: mute
+    on_pause:
+      - output.turn_on: mute
+    on_announcement:
+      - output.turn_off: mute
+    on_play:
+      - output.turn_off: mute
+
+speaker:
+  - platform: i2s_audio
+    id: spk
+    sample_rate: 16000
+    dac_type: external
+    channel: mono
+    i2s_dout_pin: GPIO25
+#    mute_pin:
+#      number: 17
+#      inverted: true
+
+output:
+  - platform: gpio
+    id: mute
+    pin:
+      number: 17
+      inverted: true
+    
 
 button:
   - platform: restart
