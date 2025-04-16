@@ -1,5 +1,8 @@
 esphome:
   name: esp_speaker
+  on_boot: 
+    then:
+      - media_player.volume_set: 85%
 
 esp32:
   board: wemos_d1_mini32
@@ -59,14 +62,10 @@ media_player:
     codec_support_enabled: false
     name: ESPHome Speaker
     buffer_size: 32000
-    #on_pause:
-    #  button.press: device_restart
+    on_pause:
+      button.press: device_restart
     #on_idle:
     #  button.press: device_restart
-    on_idle:
-      - output.turn_on: mute
-    on_pause:
-      - output.turn_on: mute
     on_announcement:
       - output.turn_off: mute
     on_play:
