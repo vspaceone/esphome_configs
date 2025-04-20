@@ -48,6 +48,14 @@ esp32_improv:
 bluetooth_proxy:
   active: True
 
+esp32_ble_beacon:
+  type: iBeacon
+  uuid: '170841a7-826a-c250-30cf-bbd8c91a8eb5'
+  major: 1337
+  minor: 40
+  tx_power: 9dBm
+  max_interval: 2000ms #to allow receiving more adv.
+
 binary_sensor:
   - platform: gpio
     pin:
