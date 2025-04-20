@@ -1,6 +1,9 @@
+dies_ist_eine_vorlage:
+
 esphome:
-  name: supermini-btproxy-brucke
-  friendly_name: "ESP-C3-SuperMini BT-Proxy Brücke"
+  name: supermini-bt-proxy
+  name_add_mac_suffix: true
+  friendly_name: "ESP-C3-SuperMini BT-Proxy"
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -22,13 +25,6 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-
-  manual_ip: 
-    static_ip: 10.0.8.31
-    subnet: 255.255.252.0
-    gateway: 10.0.8.1
-    dns1: 10.0.8.1
-    dns2: 1.1.1.1
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
