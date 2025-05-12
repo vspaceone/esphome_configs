@@ -1,0 +1,157 @@
+esphome:
+  name: esp-speaker-2
+  friendly_name: "ESP Speaker Hangar"
+  platformio_options: 
+    build_flags:
+        -DMBEDTLS_MPI_WINDOW_SIZE=1
+        -DMBEDTLS_ECP_FIXED_POINT_OPTIM=0
+        -DMBEDTLS_SSL_MAX_CONTENT_LEN=1024
+        -DMBEDTLS_AES_ROM_TABLES=1
+        -DMBEDTLS_SSL_KEEP_PEER_CERTIFICATE=0
+        -Wno-error
+        -w
+
+esp32:
+  board: esp32-s2-saola-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+  hardware_uart: UART0
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "P8GnT4gifIruFQoqc0KR3W5RfePVtP9qU+ehVm2hHXg="
+
+ota:
+  - platform: esphome
+    password: "8915ce4dc6811c47014a6b426d090436"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip: 
+    static_ip: 10.0.8.34
+    subnet: 255.255.252.0
+    gateway: 10.0.8.1
+    dns1: 10.0.8.1
+    dns2: 1.1.1.1
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esp-Speaker-2 Fallback Hotspot"
+    password: "BECoUba0CQt9"
+
+captive_portal:
+
+psram:
+  mode: quad
+  speed: 40MHz
+
+i2s_audio:
+  i2s_lrclk_pin: GPIO33
+  i2s_bclk_pin: GPIO34
+
+#media_player:
+#  - platform: i2s_audio
+#    name: ESPHome Speaker Hangar
+#    dac_type: external
+#    i2s_dout_pin: GPIO35
+#    mode: mono
+#    mute_pin:
+#      number: 17
+#      inverted: true
+
+media_player:
+  - platform: speaker
+    id: mp
+    announcement_pipeline:
+      speaker: spk
+      format: WAV
+      sample_rate: 16000
+      num_channels: 1
+    #media_pipeline:
+    #  speaker: spk_media
+    #  format: WAV
+    #  sample_rate: 32000
+    #  num_channels: 1
+    codec_support_enabled: false
+    task_stack_in_psram: true
+    name: ESPHome Speaker Hangar
+    buffer_size: 64000
+    #on_idle:
+    #  button.press: device_restart
+    on_announcement:
+      - output.turn_off: mute
+    on_play:
+      - output.turn_off: mute
+    files:
+      - id: sfx_meow
+        file: "sfx/meow.wav"
+
+speaker:
+  - platform: i2s_audio
+    id: spk
+    sample_rate: 16000
+    dac_type: external
+    use_apll: true
+    channel: left
+    i2s_dout_pin: GPIO35
+    i2s_comm_fmt: stand_i2s
+    buffer_duration: 10ms
+button:
+  - platform: template
+    id: meow_btn
+    name: "Meow"
+    on_press: 
+      then:
+        media_player.speaker.play_on_device_media_file:
+          media_file: sfx_meow
+          announcement: true
+          enqueue: false
+output:
+  - platform: gpio
+    id: mute
+    pin:
+      number: GPIO36
+      inverted: true
+
+binary_sensor:
+  - platform: status
+    name: "Online"
+    id: online
+  - platform: gpio
+    id: btn
+    pin:
+      number: 0
+      inverted: True
+      mode: 
+        pullup: True
+        input: True
+    on_press: 
+      then:
+        - media_player.speaker.play_on_device_media_file:
+            media_file: sfx_meow
+            announcement: true
+            enqueue: false
+
+debug:
+  update_interval: 5s
+text_sensor:
+  - platform: debug
+    device:
+      name: "Device Info"
+    reset_reason:
+      name: "Reset Reason"
+sensor:
+  - platform: debug
+    free:
+      name: "Heap Free"
+    block:
+      name: "Heap Max Block"
+    loop_time:
+      name: "Loop Time"
+    psram:
+      name: "Free PSRAM"
