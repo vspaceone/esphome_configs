@@ -5,7 +5,7 @@ esphome:
     build_flags:
         -DMBEDTLS_MPI_WINDOW_SIZE=1
         -DMBEDTLS_ECP_FIXED_POINT_OPTIM=0
-        -DMBEDTLS_SSL_MAX_CONTENT_LEN=1024
+        -DMBEDTLS_SSL_MAX_CONTENT_LEN=256
         -DMBEDTLS_AES_ROM_TABLES=1
         -DMBEDTLS_SSL_KEEP_PEER_CERTIFICATE=0
         -Wno-error
@@ -17,8 +17,8 @@ esp32:
     type: esp-idf
 
 # Enable logging
-logger:
-  hardware_uart: UART0
+#logger:
+#  hardware_uart: UART0
 
 # Enable Home Assistant API
 api:
@@ -67,6 +67,7 @@ i2s_audio:
 media_player:
   - platform: speaker
     id: mp
+    name: "ESP Speaker Hangar"
     announcement_pipeline:
       speaker: spk
       format: WAV
@@ -79,7 +80,6 @@ media_player:
     #  num_channels: 1
     codec_support_enabled: false
     task_stack_in_psram: true
-    name: ESPHome Speaker Hangar
     buffer_size: 64000
     #on_idle:
     #  button.press: device_restart
@@ -137,21 +137,21 @@ binary_sensor:
             announcement: true
             enqueue: false
 
-debug:
-  update_interval: 5s
-text_sensor:
-  - platform: debug
-    device:
-      name: "Device Info"
-    reset_reason:
-      name: "Reset Reason"
-sensor:
-  - platform: debug
-    free:
-      name: "Heap Free"
-    block:
-      name: "Heap Max Block"
-    loop_time:
-      name: "Loop Time"
-    psram:
-      name: "Free PSRAM"
+#debug:
+#  update_interval: 5s
+#text_sensor:
+#  - platform: debug
+#    device:
+#      name: "Device Info"
+#    reset_reason:
+#      name: "Reset Reason"
+#sensor:
+#  - platform: debug
+#    free:
+#      name: "Heap Free"
+#    block:
+#      name: "Heap Max Block"
+#    loop_time:
+#      name: "Loop Time"
+#    psram:
+#      name: "Free PSRAM"
