@@ -1,0 +1,83 @@
+esphome:
+  name: indikator-haupteingang
+  friendly_name: "Indikator Haupteingang"
+  on_boot: 
+    then: #pegelwandler aktivieren
+      - output.turn_off: led_enable1
+      - output.turn_off: led_enable2
+      - output.turn_off: led_enable3
+
+esp32:
+  board: esp32-s2-saola-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "cJD4KjCDCLFF5YGv3eQEbDfdomGS6VatWRIoZvIMv9E="
+
+ota:
+  - platform: esphome
+    password: "fb3c51e8f87259804ebfd7ed82f4b842"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  manual_ip: 
+    static_ip: 10.0.8.33
+    subnet: 255.255.252.0
+    gateway: 10.0.8.1
+    dns1: 10.0.8.1
+    dns2: 9.9.9.9
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Indikator Haupteingang"
+    password: "iDp7AuRKV3d9"
+
+captive_portal:
+
+status_led:
+  pin:
+    number: 3
+    inverted: True
+
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: 33
+    num_leds: 4
+    restore_mode: ALWAYS_OFF
+    chipset: ws2812
+    name: "Kuppel"
+    id: led_dome_indicator
+    effects:
+      - pulse:
+          name: "Pulsieren"
+          transition_length: 1s
+          update_interval: 1s
+          min_brightness: 50%
+          max_brightness: 100%
+
+output:
+  - platform: gpio
+    pin: 36
+    id: led_enable1 #pegelwandler
+  - platform: gpio
+    pin: 37
+    id: led_enable2 #pegelwandler
+  - platform: gpio
+    pin: 38
+    id: led_enable3 #pegelwandler
+
+binary_sensor:
+  - platform: status
+    name: "Online"
+    on_release: 
+      then:
+        - light.turn_off: led_dome_indicator

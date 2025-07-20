@@ -1,15 +1,6 @@
 esphome:
   name: esp-speaker-2
   friendly_name: "ESP Speaker Hangar"
-  platformio_options: 
-    build_flags:
-        -DMBEDTLS_MPI_WINDOW_SIZE=1
-        -DMBEDTLS_ECP_FIXED_POINT_OPTIM=0
-        -DMBEDTLS_SSL_MAX_CONTENT_LEN=256
-        -DMBEDTLS_AES_ROM_TABLES=1
-        -DMBEDTLS_SSL_KEEP_PEER_CERTIFICATE=0
-        -Wno-error
-        -w
 
 esp32:
   board: esp32-s2-saola-1
@@ -46,9 +37,12 @@ wifi:
 
 captive_portal:
 
+status_led:
+  pin: 2
+
 psram:
   mode: quad
-  speed: 40MHz
+  speed: 80Mhz
 
 i2s_audio:
   i2s_lrclk_pin: GPIO33
@@ -80,7 +74,7 @@ media_player:
     #  num_channels: 1
     codec_support_enabled: false
     task_stack_in_psram: true
-    buffer_size: 64000
+    buffer_size: 262144
     #on_idle:
     #  button.press: device_restart
     on_announcement:
