@@ -1,0 +1,205 @@
+esphome:
+  name: doppeltouch-relais
+  friendly_name: Doppeltouch-Relais
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+  hardware_uart: UART0 #USB sadly not usable :(
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "uhJ+l7JQ3MT3RUO1esSRwv0krsyD9UvLxOM4wcDNNZ4="
+
+ota:
+  - platform: esphome
+    password: "8b8d0bcafa27ecba8149afa093237e42"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Doppeltouch-Relais"
+    password: "er92Pq9weuIm"
+
+captive_portal:
+
+
+status_led:
+  pin:
+    number: GPIO9
+    inverted: True
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/H3wastooshort/esphome_AT42QT.git
+      ref: main
+    components: [ at42qt ]
+    refresh: 60s
+
+i2c:
+  scl: GPIO5
+  sda: GPIO6
+
+at42qt:
+  id: touch_ic
+  pulse_length: 128
+
+binary_sensor:
+  - platform: status
+    name: "Online"
+    id: online
+  - platform: at42qt
+    at42qt_hub_id: touch_ic
+    name: "Touch Center"
+    id: touch0
+    channel: 3
+    threshold: 5
+    oversampling: 0x20
+    entity_category: DIAGNOSTIC
+    on_press:
+      then:
+        switch.toggle: relay1
+  - platform: at42qt
+    at42qt_hub_id: touch_ic
+    name: "Touch 1"
+    id: touch1
+    channel: 8
+    threshold: 5
+    oversampling: 0x20
+    entity_category: DIAGNOSTIC
+    on_press:
+      then:
+        switch.toggle: relay1
+  - platform: at42qt
+    at42qt_hub_id: touch_ic
+    name: "Touch 2"
+    id: touch2
+    channel: 0
+    threshold: 5
+    oversampling: 0x20
+    entity_category: DIAGNOSTIC
+    on_press:
+      then:
+        switch.toggle: relay2
+
+switch:
+  - platform: gpio
+    name: "Relay 1 (X4)"
+    id: relay1
+    pin:
+      number: GPIO10
+    on_state:
+      then:
+        - script.execute: set_led
+  - platform: gpio
+    name: "Relay 2 (X3)"
+    id: relay2
+    pin:
+      number: GPIO1
+    on_state:
+      then:
+        - script.execute: set_led
+
+output:
+  - platform: ledc
+    pin: GPIO19
+    id: led1
+  - platform: ledc
+    pin: GPIO0
+    id: led2
+
+
+number:
+number:
+  - platform: template
+    name: "LED On-Brigthness"
+    id: led_brightness_on
+    max_value: 1
+    min_value: 0
+    step: 0.1
+    initial_value: 1.0
+    entity_category: CONFIG
+    restore_value: True
+    optimistic: True
+    on_value: 
+      then:
+        - script.execute: set_led
+  - platform: template
+    name: "LED Off-Brigthness"
+    id: led_brightness_off
+    max_value: 1
+    min_value: 0
+    step: 0.1
+    initial_value: 0.1
+    entity_category: CONFIG
+    restore_value: True
+    optimistic: True
+    on_value:
+      then:
+        - script.execute: set_led
+
+script:
+  - id: set_led
+    then:
+      - if: 
+          condition:
+            switch.is_on: relay1
+          then:
+            output.set_level: 
+              id: led1
+              level: !lambda return id(led_brightness_on).state;
+          else:
+            output.set_level: 
+              id: led1
+              level: !lambda return id(led_brightness_off).state;
+      - if: 
+          condition:
+            switch.is_on: relay2
+          then:
+            output.set_level: 
+              id: led2
+              level: !lambda return id(led_brightness_on).state;
+          else:
+            output.set_level: 
+              id: led2
+              level: !lambda return id(led_brightness_off).state;
+
+
+web_server:
+  local: True
+  ota: False
+
+
+# Example configuration entry
+debug:
+  update_interval: 5s
+
+text_sensor:
+  - platform: debug
+    device:
+      name: "Device Info"
+    reset_reason:
+      name: "Reset Reason"
+
+sensor:
+  - platform: debug
+    free:
+      name: "Heap Free"
+    block:
+      name: "Heap Max Block"
+    loop_time:
+      name: "Loop Time"
+    cpu_frequency:
+      name: "CPU Frequency"
+
+bluetooth_proxy:
+  active: True
