@@ -19,6 +19,20 @@ api:
 ota:
   - platform: esphome
     password: "8b8d0bcafa27ecba8149afa093237e42"
+    on_progress:
+      then:
+        - output.set_level: 
+            id: led1
+            level: !lambda >-
+              static bool ota_blink=false;
+              ota_blink=!ota_blink;
+              return ota_blink ? x : 0.0f;
+        - output.set_level: 
+            id: led2
+            level: !lambda >-
+              static bool ota_blink=true;
+              ota_blink=!ota_blink;
+              return ota_blink ? x : 0.0f;
 
 wifi:
   ssid: !secret wifi_ssid
@@ -30,7 +44,6 @@ wifi:
     password: "er92Pq9weuIm"
 
 captive_portal:
-
 
 status_led:
   pin:
@@ -119,7 +132,6 @@ output:
 
 
 number:
-number:
   - platform: template
     name: "LED On-Brigthness"
     id: led_brightness_on
@@ -133,6 +145,7 @@ number:
     on_value: 
       then:
         - script.execute: set_led
+
   - platform: template
     name: "LED Off-Brigthness"
     id: led_brightness_off
@@ -173,13 +186,10 @@ script:
               id: led2
               level: !lambda return id(led_brightness_off).state;
 
-
 web_server:
   local: True
   ota: False
 
-
-# Example configuration entry
 debug:
   update_interval: 5s
 
@@ -201,5 +211,30 @@ sensor:
     cpu_frequency:
       name: "CPU Frequency"
 
+  - platform: at42qt
+    at42qt_hub_id: touch_ic
+    channel: 3
+    signal:
+      name: "Touch Center Signal"
+    reference:
+      name: "Touch Center Reference"
+    update_interval: 1s
+  - platform: at42qt
+    at42qt_hub_id: touch_ic
+    channel: 8
+    signal:
+      name: "Touch 1 Signal"
+    reference:
+      name: "Touch 1 Reference"
+    update_interval: 1s
+  - platform: at42qt
+    at42qt_hub_id: touch_ic
+    channel: 0
+    signal:
+      name: "Touch 2 Signal"
+    reference:
+      name: "Touch 2 Reference"
+    update_interval: 1s
+
 bluetooth_proxy:
-  active: True
+  active: False
