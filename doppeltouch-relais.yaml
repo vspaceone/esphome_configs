@@ -21,18 +21,18 @@ ota:
     password: "8b8d0bcafa27ecba8149afa093237e42"
     on_progress:
       then:
-        - output.set_level: 
+        - output.set_level:
             id: led1
             level: !lambda >-
               static bool ota_blink=false;
               ota_blink=!ota_blink;
-              return ota_blink ? x : 0.0f;
-        - output.set_level: 
+              return ota_blink ? x/100 : 0.0f;
+        - output.set_level:
             id: led2
             level: !lambda >-
               static bool ota_blink=true;
               ota_blink=!ota_blink;
-              return ota_blink ? x : 0.0f;
+              return ota_blink ? x/100 : 0.0f;
 
 wifi:
   ssid: !secret wifi_ssid
@@ -70,6 +70,9 @@ binary_sensor:
   - platform: status
     name: "Online"
     id: online
+    on_press:
+      then:
+        script.execute: set_led
   - platform: at42qt
     at42qt_hub_id: touch_ic
     name: "Touch Center"
@@ -142,7 +145,7 @@ number:
     entity_category: CONFIG
     restore_value: True
     optimistic: True
-    on_value: 
+    on_value:
       then:
         - script.execute: set_led
 
@@ -160,31 +163,51 @@ number:
       then:
         - script.execute: set_led
 
+#explaination for fucked up code. i'd prefer keeping the factor calculation on one line, but thats not trivial in esphome
+# id(led_brightness_on).state // take the disired intensity
+# * (id(online).state ? 1.0f :  // if online, leave as is
+#   ((millis()%1000)<500 // else, depending on weather it is the first or second half of a second
+#      ? 0.75 : 0.25f)); // make it 75% or 25% 
 script:
   - id: set_led
     then:
-      - if: 
+      - if:
           condition:
             switch.is_on: relay1
           then:
-            output.set_level: 
+            output.set_level:
               id: led1
-              level: !lambda return id(led_brightness_on).state;
+              level: !lambda >-
+                return id(led_brightness_on).state * (id(online).state ? 1.0f : ((millis()%1000)<500 ? 0.75 : 0.25f));
           else:
-            output.set_level: 
+            output.set_level:
               id: led1
-              level: !lambda return id(led_brightness_off).state;
-      - if: 
+              level: !lambda >-
+                return id(led_brightness_off).state * (id(online).state ? 1.0f : ((millis()%1000)<500 ? 0.75 : 0.25f));
+      - if:
           condition:
             switch.is_on: relay2
           then:
-            output.set_level: 
+            output.set_level:
               id: led2
-              level: !lambda return id(led_brightness_on).state;
+              level: !lambda >-
+                return id(led_brightness_on).state * (id(online).state ? 1.0f : ((millis()%1000)<500 ? 0.75 : 0.25f));
           else:
-            output.set_level: 
+            output.set_level:
               id: led2
-              level: !lambda return id(led_brightness_off).state;
+              level: !lambda >-
+                return id(led_brightness_off).state * (id(online).state ? 1.0f : ((millis()%1000)<500 ? 0.75 : 0.25f));
+
+interval:
+  interval:
+    seconds: 0.1
+  then:
+    - if:
+        condition:
+          not:
+            binary_sensor.is_on: online
+        then:
+          script.execute: set_led
 
 web_server:
   local: True
