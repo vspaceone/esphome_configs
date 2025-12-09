@@ -1,0 +1,221 @@
+esphome:
+  name: einzeltouch-relais
+  friendly_name: "Einzeltouch-Relais "
+  name_add_mac_suffix: True
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+  hardware_uart: UART0 #USB sadly not usable :(
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "h2HQoBQx98wi5XCgqhyrjuJ+L6sYoC+KhYHGUx6/mNA="
+
+ota:
+  - platform: esphome
+    password: "c88374a07b0fccc4b70e587113f93d13"
+    on_progress:
+      then:
+        - output.set_level:
+            id: led1
+            level: !lambda >-
+              static bool ota_blink=false;
+              ota_blink=!ota_blink;
+              return ota_blink ? x/100 : 0.0f;
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Einzeltouch-Relais"
+    password: "fzhLsVv3QOe2"
+
+captive_portal:
+improv_serial:
+esp32_improv:
+  authorizer: authorize_improv
+
+
+status_led:
+  pin:
+    number: GPIO9
+    inverted: True
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/H3wastooshort/esphome_AT42QT.git
+      ref: main
+    components: [ at42qt ]
+    refresh: 60s
+
+i2c:
+  scl: GPIO5
+  sda: GPIO6
+
+at42qt:
+  id: touch_ic
+  pulse_length: 128
+
+binary_sensor:
+  - platform: status
+    name: "Online"
+    id: online
+    on_press:
+      then:
+        script.execute: set_led
+  - platform: at42qt
+    at42qt_hub_id: touch_ic
+    name: "Touch"
+    id: touch0
+    channel: 3
+    threshold: 5
+    oversampling: 0x20
+    entity_category: DIAGNOSTIC
+    on_press:
+      then:
+        switch.toggle: relay1
+  #BLE improv stuff
+  - platform: template
+    id: authorize_improv
+  - platform: template
+    id: touch_any
+    condition:
+      or:
+        binary_sensor.is_on: touch0
+    on_click:
+      min_length: 3s
+      max_length: 10s
+      then:
+        - binary_sensor.template.publish:
+            id: authorize_improv
+            state: ON
+    on_release: 
+      then:
+        - binary_sensor.template.publish:
+            id: authorize_improv
+            state: OFF
+
+
+switch:
+  - platform: gpio
+    name: "Relay (X4)"
+    id: relay1
+    pin:
+      number: GPIO10
+    on_state:
+      then:
+        - script.execute: set_led
+
+output:
+  - platform: ledc
+    pin: GPIO7
+    id: led1
+
+
+number:
+  - platform: template
+    name: "LED On-Brigthness"
+    id: led_brightness_on
+    max_value: 1
+    min_value: 0
+    step: 0.1
+    initial_value: 1.0
+    entity_category: CONFIG
+    restore_value: True
+    optimistic: True
+    on_value:
+      then:
+        - script.execute: set_led
+
+  - platform: template
+    name: "LED Off-Brigthness"
+    id: led_brightness_off
+    max_value: 1
+    min_value: 0
+    step: 0.1
+    initial_value: 0.1
+    entity_category: CONFIG
+    restore_value: True
+    optimistic: True
+    on_value:
+      then:
+        - script.execute: set_led
+
+#explaination for fucked up code. i'd prefer keeping the factor calculation on one line, but thats not trivial in esphome
+# id(led_brightness_on).state // take the disired intensity
+# * (id(online).state ? 1.0f :  // if online, leave as is
+#   ((millis()%1000)<500 // else, depending on weather it is the first or second half of a second
+#      ? 0.75 : 0.25f)); // make it 75% or 25% 
+script:
+  - id: set_led
+    then:
+      - if:
+          condition:
+            switch.is_on: relay1
+          then:
+            output.set_level:
+              id: led1
+              level: !lambda >-
+                return id(led_brightness_on).state * (id(online).state ? 1.0f : ((millis()%1000)<500 ? 0.75 : 0.25f));
+          else:
+            output.set_level:
+              id: led1
+              level: !lambda >-
+                return id(led_brightness_off).state * (id(online).state ? 1.0f : ((millis()%1000)<500 ? 0.75 : 0.25f));
+
+interval:
+  interval:
+    seconds: 0.1
+  then:
+    - if:
+        condition:
+          not:
+            binary_sensor.is_on: online
+        then:
+          script.execute: set_led
+
+web_server:
+  local: True
+  ota: False
+
+debug:
+  update_interval: 5s
+
+text_sensor:
+  - platform: debug
+    device:
+      name: "Device Info"
+    reset_reason:
+      name: "Reset Reason"
+
+sensor:
+  - platform: debug
+    free:
+      name: "Heap Free"
+    block:
+      name: "Heap Max Block"
+    loop_time:
+      name: "Loop Time"
+    cpu_frequency:
+      name: "CPU Frequency"
+
+  - platform: at42qt
+    at42qt_hub_id: touch_ic
+    channel: 3
+    signal:
+      name: "Touch Center Signal"
+    reference:
+      name: "Touch Center Reference"
+    update_interval: 1s
+
+bluetooth_proxy:
+  active: False
