@@ -1,6 +1,7 @@
 esphome:
   name: doppeltouch-relais
-  friendly_name: Doppeltouch-Relais
+  friendly_name: "Doppeltouch-Relais "
+  name_add_mac_suffix: True
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -44,6 +45,10 @@ wifi:
     password: "er92Pq9weuIm"
 
 captive_portal:
+improv_serial:
+esp32_improv:
+  authorizer: authorize_improv
+
 
 status_led:
   pin:
@@ -75,17 +80,6 @@ binary_sensor:
         script.execute: set_led
   - platform: at42qt
     at42qt_hub_id: touch_ic
-    name: "Touch Center"
-    id: touch0
-    channel: 3
-    threshold: 5
-    oversampling: 0x20
-    entity_category: DIAGNOSTIC
-    on_press:
-      then:
-        switch.toggle: relay1
-  - platform: at42qt
-    at42qt_hub_id: touch_ic
     name: "Touch 1"
     id: touch1
     channel: 8
@@ -106,6 +100,28 @@ binary_sensor:
     on_press:
       then:
         switch.toggle: relay2
+  #BLE improv stuff
+  - platform: template
+    id: authorize_improv
+  - platform: template
+    id: touch_any
+    condition:
+      or:
+        - binary_sensor.is_on: touch1
+        - binary_sensor.is_on: touch2
+    on_click:
+      min_length: 3s
+      max_length: 10s
+      then:
+        - binary_sensor.template.publish:
+            id: authorize_improv
+            state: ON
+    on_release: 
+      then:
+        - binary_sensor.template.publish:
+            id: authorize_improv
+            state: OFF
+
 
 switch:
   - platform: gpio
@@ -234,14 +250,6 @@ sensor:
     cpu_frequency:
       name: "CPU Frequency"
 
-  - platform: at42qt
-    at42qt_hub_id: touch_ic
-    channel: 3
-    signal:
-      name: "Touch Center Signal"
-    reference:
-      name: "Touch Center Reference"
-    update_interval: 1s
   - platform: at42qt
     at42qt_hub_id: touch_ic
     channel: 8
