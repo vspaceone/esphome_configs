@@ -157,10 +157,12 @@ binary_sensor:
     on_press:
       - if:
           condition:
-            not: #important. ignore "unknown" states
-              sensor.in_range:
-                id: device1_current
-                above: ${trigger_current}
+            or:
+              - switch.is_off: device1_sw
+              - not: #important. ignore "unknown" states
+                  sensor.in_range:
+                    id: device1_current
+                    above: ${trigger_current}
           then:
             - switch.toggle: device1_sw
           else:
@@ -189,10 +191,12 @@ binary_sensor:
     on_press:
       - if:
           condition:
-            not: #important. ignore "unknown" states
-              sensor.in_range:
-                id: device2_current
-                above: ${trigger_current}
+            or:
+              - switch.is_off: device2_sw
+              - not: #important. ignore "unknown" states
+                  sensor.in_range:
+                    id: device2_current
+                    above: ${trigger_current}
           then:
             - switch.toggle: device2_sw
           else:
@@ -221,10 +225,12 @@ binary_sensor:
     on_press:
       - if:
           condition:
-            not: #important. ignore "unknown" states
-              sensor.in_range:
-                id: device3_current
-                above: ${trigger_current}
+            or:
+              - switch.is_off: device3_sw
+              - not: #important. ignore "unknown" states
+                  sensor.in_range:
+                    id: device3_current
+                    above: ${trigger_current}
           then:
             - switch.toggle: device3_sw
           else:
@@ -253,10 +259,12 @@ binary_sensor:
     on_press:
       - if:
           condition:
-            not: #important. ignore "unknown" states
-              sensor.in_range:
-                id: device4_current
-                above: ${trigger_current}
+            or:
+              - switch.is_off: device4_sw
+              - not: #important. ignore "unknown" states
+                  sensor.in_range:
+                    id: device4_current
+                    above: ${trigger_current}
           then:
             - switch.toggle: device4_sw
           else:
