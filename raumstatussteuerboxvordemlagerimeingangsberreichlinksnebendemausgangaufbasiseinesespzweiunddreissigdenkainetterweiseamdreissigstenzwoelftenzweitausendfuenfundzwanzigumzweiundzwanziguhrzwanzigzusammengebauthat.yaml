@@ -1,0 +1,221 @@
+#Controller for two buttons in the vspace.one central control-box
+#Buttons can be pressed tempoarily and can output 1bit RGB colors
+
+substitutions:
+  entity_id_space_state: switch.space_state
+  entity_id_rundumlicht: switch.blinklicht_klingel_rundumlicht
+
+esphome:
+  name: raumstatus-steuerbox-esp32-c3
+  friendly_name: raumstatussteuerboximeingangsberreichnebendemausgangaufbasiseinesesp32-c3denkainetterweiseam30122025zusammengebauthat
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "OsDrA5bpKsGb0duSYqF25+BQ8w3gHKtFrFT4Nvz3SK4="
+
+ota:
+  - platform: esphome
+    password: "36b4b5d473c32eadb1ffb0ec4d031f27"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Raumstatus-Steuerbox-esp32-c3"
+    password: "dii4OKVWqPCZ"
+
+  manual_ip: 
+    static_ip: 10.0.8.42
+    subnet: 255.255.252.0
+    gateway: 10.0.8.1
+    dns1: 10.0.8.1
+    dns2: 1.1.1.1
+
+captive_portal:
+
+
+status_led:
+  pin:
+    number: GPIO7
+    inverted: True
+
+switch:
+  - platform: homeassistant
+    id: ha_space_state_switch
+    entity_id: ${entity_id_space_state}
+    restore_mode: DISABLED
+  - platform: homeassistant
+    id: ha_rundumlicht_switch
+    entity_id: ${entity_id_rundumlicht}
+    restore_mode: DISABLED
+
+text_sensor:
+  - platform: homeassistant
+    id: ha_space_state
+    entity_id: ${entity_id_space_state}
+    on_value: 
+      then:
+        - if:
+            condition:
+              lambda: 'return x == "on";'
+            then:
+              - light.turn_on:
+                  id: space_state_led
+                  brightness: 100%
+                  red: 0%
+                  green: 100%
+                  blue: 0%
+                  effect: none
+            else:
+              - if:
+                  condition:
+                    lambda: 'return x == "off";'
+                  then:
+                    - light.turn_on:
+                        id: space_state_led
+                        brightness: 100%
+                        red: 100%
+                        green: 0%
+                        blue: 0%
+                        effect: none
+                  else:
+                    - light.turn_on:
+                        id: space_state_led
+                        brightness: 100%
+                        red: 100%
+                        green: 65%
+                        blue: 0%
+                        effect: none
+
+  - platform: homeassistant
+    id: ha_rundumlicht_state
+    entity_id: ${entity_id_rundumlicht}
+    on_value: 
+      then:
+        - if:
+            condition:
+              lambda: 'return x == "on";'
+            then:
+              - light.turn_on:
+                  id: rundumlicht_led
+                  brightness: 100%
+                  red: 0%
+                  green: 100%
+                  blue: 0%
+                  effect: none
+            else:
+              - if:
+                  condition:
+                    lambda: 'return x == "off";'
+                  then:
+                    - light.turn_on:
+                        id: rundumlicht_led
+                        brightness: 100%
+                        red: 100%
+                        green: 0%
+                        blue: 0%
+                        effect: none
+                  else:
+                    - light.turn_on:
+                        id: rundumlicht_led
+                        brightness: 100%
+                        red: 100%
+                        green: 65%
+                        blue: 0%
+                        effect: none
+
+binary_sensor:
+  - platform: status
+    id: is_online
+    name: "Steuerbox Online"
+  - platform: gpio
+    id: space_state_btn
+    name: "Steuerbox Space-State Toggle Button"
+    disabled_by_default: False
+    pin:
+      number: GPIO10
+      inverted: True
+      mode:
+        input: True
+        pullup: True
+    filters:
+      - delayed_on: 100ms
+      - delayed_off: 100ms
+    on_press:
+      - homeassistant.action:
+          action: switch.toggle
+          data:
+            entity_id: switch.space_state
+  - platform: gpio
+    id: rundumlicht_btn
+    name: "Steuerbox Rundumlicht Toggle Button"
+    disabled_by_default: False
+    pin:
+      number: GPIO1
+      inverted: True
+      mode:
+        input: True
+        pullup: True
+    filters:
+      - delayed_on: 100ms
+      - delayed_off: 100ms
+    on_press:
+      - homeassistant.action:
+          action: switch.toggle
+          data:
+            entity_id: switch.blinklicht_klingel_rundumlicht
+
+
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: RGB
+
+    id: button_leds
+    pin: GPIO0
+    num_leds: 2
+    chipset: ws2811
+  - platform: partition
+    id: space_state_led
+    disabled_by_default: True
+    entity_category: DIAGNOSTIC
+    name: "Steuerbox Space-State LED"
+    icon: "mdi:led-off"
+    segments:
+    - id: button_leds
+      from: 0
+      to: 0
+    effects:
+      - pulse:
+          name: "blink"
+          transition_length: 0.1s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
+  - platform: partition
+    id: rundumlicht_led
+    disabled_by_default: True
+    entity_category: DIAGNOSTIC
+    name: "Steuerbox Rundumlicht LED"
+    icon: "mdi:led-off"
+    segments:
+    - id: button_leds
+      from: 1
+      to: 1
+    effects:
+      - pulse:
+          name: "blink"
+          transition_length: 0.1s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%

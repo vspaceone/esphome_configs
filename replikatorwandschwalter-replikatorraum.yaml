@@ -1,0 +1,499 @@
+substitutions:
+  switch1: switch.rr1
+  switch2: switch.rr2
+  switch3: switch.rr3
+  switch4: switch.rr4
+  current1: sensor.rr1_current
+  current2: sensor.rr2_current
+  current3: sensor.rr3_current
+  current4: sensor.rr4_current
+  trigger_current: 0.25
+
+
+esphome:
+  name: replschalter-replikatorraum
+  friendly_name: replikatorwandschwalter-replikatorraum
+  on_boot: 
+    then:
+      - light.turn_on:
+          id: button_leds
+          brightness: 50%
+          red: 0%
+          green: 0%
+          blue: 100%
+
+esp8266:
+  board: huzzah
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "pNM1tAAvAtiRo3w315LUBDjUX7ozoVbsP6EwQg7PcJQ="
+
+ota:
+  - platform: esphome
+    password: "4e9d516c137ae2e6d50e10d5fb16232d"
+    on_begin:
+      then:
+        - light.turn_on:
+            id: button_leds
+            brightness: 50%
+            red: 100%
+            green: 0%
+            blue: 100%
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Replchalter-Replikatorraum"
+    password: "vFIGUU1mlGfh"
+
+  manual_ip: 
+    static_ip: 10.0.8.43
+    subnet: 255.255.252.0
+    gateway: 10.0.8.1
+    dns1: 10.0.8.1
+    dns2: 1.1.1.1
+
+
+captive_portal:
+
+status_led:
+  pin:
+    number: GPIO2
+
+button:
+  - platform: restart
+    entity_category: DIAGNOSTIC
+    name: "Reboot"
+
+switch:
+  - platform: homeassistant
+    id: device1_sw
+    entity_id: ${switch1}
+    restore_mode: DISABLED
+    on_state:
+      then:
+        - script.execute:
+            id: update_light_status1
+  - platform: homeassistant
+    id: device2_sw
+    entity_id: ${switch2}
+    restore_mode: DISABLED
+    on_state:
+      then:
+        - script.execute:
+            id: update_light_status2
+  - platform: homeassistant
+    id: device3_sw
+    entity_id: ${switch3}
+    restore_mode: DISABLED
+    on_state:
+      then:
+        - script.execute:
+            id: update_light_status3
+  - platform: homeassistant
+    id: device4_sw
+    entity_id: ${switch4}
+    restore_mode: DISABLED
+    on_state:
+      then:
+        - script.execute:
+            id: update_light_status4
+
+
+sensor:
+  - platform: homeassistant
+    id: device1_current
+    entity_id: ${current1}
+    on_value:
+      then:
+        - script.execute:
+            id: update_light_status1
+  - platform: homeassistant
+    id: device2_current
+    entity_id: ${current2}
+    on_value:
+      then:
+        - script.execute:
+            id: update_light_status2
+  - platform: homeassistant
+    id: device3_current
+    entity_id: ${current3}
+    on_value:
+      then:
+        - script.execute:
+            id: update_light_status3
+  - platform: homeassistant
+    id: device4_current
+    entity_id: ${current4}
+    on_value:
+      then:
+        - script.execute:
+            id: update_light_status4
+
+
+
+binary_sensor:
+  - platform: status
+    id: is_online
+    name: "Steuerbox Online"
+  - platform: gpio
+    id: device1_btn
+    name: "Device 1 Button"
+    disabled_by_default: False
+    pin:
+      number: GPIO5
+      inverted: True
+      mode:
+        input: True
+        pullup: True
+    on_press:
+      - if:
+          condition:
+            not: #important. ignore "unknown" states
+              sensor.in_range:
+                id: device1_current
+                above: ${trigger_current}
+          then:
+            - switch.toggle: device1_sw
+          else:
+            - light.turn_on:
+                id: status_light_1
+                brightness: 100%
+                red: 100%
+                green: 100%
+                blue: 0%
+                flash_length: 0.5s
+    on_click:
+      min_length: 3s
+      max_length: 30s
+      then:
+        - switch.turn_off: device1_sw
+  - platform: gpio
+    id: device2_btn
+    name: "Device 2 Button"
+    disabled_by_default: False
+    pin:
+      number: GPIO12
+      inverted: True
+      mode:
+        input: True
+        pullup: True
+    on_press:
+      - if:
+          condition:
+            not: #important. ignore "unknown" states
+              sensor.in_range:
+                id: device2_current
+                above: ${trigger_current}
+          then:
+            - switch.toggle: device2_sw
+          else:
+            - light.turn_on:
+                id: status_light_2
+                brightness: 100%
+                red: 100%
+                green: 100%
+                blue: 0%
+                flash_length: 0.5s
+    on_click:
+      min_length: 3s
+      max_length: 30s
+      then:
+        - switch.turn_off: device2_sw
+  - platform: gpio
+    id: device3_btn
+    name: "Device 3 Button"
+    disabled_by_default: False
+    pin:
+      number: GPIO13
+      inverted: True
+      mode:
+        input: True
+        pullup: True
+    on_press:
+      - if:
+          condition:
+            not: #important. ignore "unknown" states
+              sensor.in_range:
+                id: device3_current
+                above: ${trigger_current}
+          then:
+            - switch.toggle: device3_sw
+          else:
+            - light.turn_on:
+                id: status_light_3
+                brightness: 100%
+                red: 100%
+                green: 100%
+                blue: 0%
+                flash_length: 0.5s
+    on_click:
+      min_length: 3s
+      max_length: 30s
+      then:
+        - switch.turn_off: device3_sw
+  - platform: gpio
+    id: device4_btn
+    name: "Device 4 Button"
+    disabled_by_default: False
+    pin:
+      number: GPIO14
+      inverted: True
+      mode:
+        input: True
+        pullup: True
+    on_press:
+      - if:
+          condition:
+            not: #important. ignore "unknown" states
+              sensor.in_range:
+                id: device4_current
+                above: ${trigger_current}
+          then:
+            - switch.toggle: device4_sw
+          else:
+            - light.turn_on:
+                id: status_light_4
+                brightness: 100%
+                red: 100%
+                green: 100%
+                blue: 0%
+                flash_length: 0.5s
+    on_click:
+      min_length: 3s
+      max_length: 30s
+      then:
+        - switch.turn_off: device4_sw
+
+
+
+light:
+  - platform: neopixelbus
+    id: button_leds
+    type: RGB
+    variant: WS2811
+    pin: GPIO4
+    num_leds: 5
+    # First WS2812 is used as an levelshifter for the rest
+  - platform: partition
+    id: status_light_1
+    disabled_by_default: True
+    entity_category: DIAGNOSTIC
+    name: "Device 1 LED"
+    icon: "mdi:led-off"
+    segments:
+    - id: button_leds
+      from: 1
+      to: 1
+    effects:
+      - pulse:
+          max_brightness: 100%
+          min_brightness: 50%
+  - platform: partition
+    id: status_light_2
+    disabled_by_default: True
+    entity_category: DIAGNOSTIC
+    name: "Device 2 LED"
+    icon: "mdi:led-off"
+    segments:
+    - id: button_leds
+      from: 2
+      to: 2
+    effects:
+      - pulse:
+          max_brightness: 100%
+          min_brightness: 50%
+  - platform: partition
+    id: status_light_3
+    disabled_by_default: True
+    entity_category: DIAGNOSTIC
+    name: "Device 3 LED"
+    icon: "mdi:led-off"
+    segments:
+    - id: button_leds
+      from: 3
+      to: 3
+    effects:
+      - pulse:
+          max_brightness: 100%
+          min_brightness: 50%
+  - platform: partition
+    id: status_light_4
+    disabled_by_default: True
+    entity_category: DIAGNOSTIC
+    name: "Device 4 LED"
+    icon: "mdi:led-off"
+    segments:
+    - id: button_leds
+      from: 4
+      to: 4
+    effects:
+      - pulse:
+          max_brightness: 100%
+          min_brightness: 50%
+
+script:
+  - id: update_light_status1
+    then:
+      - lambda: |-
+          auto light = id(status_light_1);
+          auto sw = id(device1_sw);
+          auto current = id(device1_current);
+          
+          static uint8_t last_state = 255;
+          uint8_t state_now = 0;
+          if (!sw->state) state_now = 0;
+          else if (current->state < ${trigger_current}) state_now = 1;
+          else state_now = 2;
+
+          if (last_state != state_now) {
+            ESP_LOGD("update_light_status","new state: %d",state_now);
+            auto call = light->turn_on();
+            switch(state_now) {
+              default:
+              case 0:
+                // Red when switch is off
+                call.set_rgb(1.0, 0.0, 0.1);
+                call.set_effect("none");
+                break;
+            
+              case 1:
+                // Solid green when switch on and current < 1
+                call.set_rgb(0.0, 1.0, 0.0);
+                call.set_effect("none");
+                break;
+              
+              case 2:
+                // Pulsating green when switch on and current >= 1
+                call.set_rgb(0.0, 1.0, 0.0);
+                call.set_effect("pulse");
+                break;
+            }
+            last_state=state_now;
+            call.perform();
+          }
+  - id: update_light_status2
+    then:
+      - lambda: |-
+          auto light = id(status_light_2);
+          auto sw = id(device2_sw);
+          auto current = id(device2_current);
+          
+          static uint8_t last_state = 255;
+          uint8_t state_now = 0;
+          if (!sw->state) state_now = 0;
+          else if (current->state < ${trigger_current}) state_now = 1;
+          else state_now = 2;
+
+          if (last_state != state_now) {
+            ESP_LOGD("update_light_status","new state: %d",state_now);
+            auto call = light->turn_on();
+            switch(state_now) {
+              default:
+              case 0:
+                // Red when switch is off
+                call.set_rgb(1.0, 0.0, 0.1);
+                call.set_effect("none");
+                break;
+            
+              case 1:
+                // Solid green when switch on and current < 1
+                call.set_rgb(0.0, 1.0, 0.0);
+                call.set_effect("none");
+                break;
+              
+              case 2:
+                // Pulsating green when switch on and current >= 1
+                call.set_rgb(0.0, 1.0, 0.0);
+                call.set_effect("pulse");
+                break;
+            }
+            last_state=state_now;
+            call.perform();
+          }
+  - id: update_light_status3
+    then:
+      - lambda: |-
+          auto light = id(status_light_3);
+          auto sw = id(device3_sw);
+          auto current = id(device3_current);
+
+          static uint8_t last_state = 255;
+          uint8_t state_now = 0;
+          if (!sw->state) state_now = 0;
+          else if (current->state < ${trigger_current}) state_now = 1;
+          else state_now = 2;
+
+          if (last_state != state_now) {
+            ESP_LOGD("update_light_status","new state: %d",state_now);
+            auto call = light->turn_on();
+            switch(state_now) {
+              default:
+              case 0:
+                // Red when switch is off
+                call.set_rgb(1.0, 0.0, 0.1);
+                call.set_effect("none");
+                break;
+            
+              case 1:
+                // Solid green when switch on and current < 1
+                call.set_rgb(0.0, 1.0, 0.0);
+                call.set_effect("none");
+                break;
+              
+              case 2:
+                // Pulsating green when switch on and current >= 1
+                call.set_rgb(0.0, 1.0, 0.0);
+                call.set_effect("pulse");
+                break;
+            }
+            last_state=state_now;
+            call.perform();
+          }
+  - id: update_light_status4
+    then:
+      - lambda: |-
+          auto light = id(status_light_4);
+          auto sw = id(device4_sw);
+          auto current = id(device4_current);
+          
+          static uint8_t last_state = 255;
+          uint8_t state_now = 0;
+          if (!sw->state) state_now = 0;
+          else if (current->state < ${trigger_current}) state_now = 1;
+          else state_now = 2;
+
+          if (last_state != state_now) {
+            ESP_LOGD("update_light_status","new state: %d",state_now);
+            auto call = light->turn_on();
+            switch(state_now) {
+              default:
+              case 0:
+                // Red when switch is off
+                call.set_rgb(1.0, 0.0, 0.1);
+                call.set_effect("none");
+                break;
+            
+              case 1:
+                // Solid green when switch on and current < 1
+                call.set_rgb(0.0, 1.0, 0.0);
+                call.set_effect("none");
+                break;
+              
+              case 2:
+                // Pulsating green when switch on and current >= 1
+                call.set_rgb(0.0, 1.0, 0.0);
+                call.set_effect("pulse");
+                break;
+            }
+            last_state=state_now;
+            call.perform();
+          }

@@ -1,0 +1,85 @@
+esphome:
+  name: lichtschalter-replikatorraum
+  friendly_name: lichtschalter-replikatorraum
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "oLlTwb2pWESh8vpYJJHZrWdjLQGIosDGHFqULZG20JE="
+
+ota:
+  - platform: esphome
+    password: "9812259d923721e709075e76258a9ae4"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Lichtschalter-Replikatorraum"
+    password: "qkKHIAPPNVBU"
+
+  manual_ip: 
+    static_ip: 10.0.8.41
+    subnet: 255.255.252.0
+    gateway: 10.0.8.1
+    dns1: 10.0.8.1
+    dns2: 1.1.1.1
+
+captive_portal:
+    
+status_led:
+  pin:
+    number: GPIO7
+    inverted: True
+
+
+binary_sensor:
+  - platform: status
+    id: is_online
+    name: "Lichtschalter Replikatorraum Online"
+  - platform: gpio
+    id: licht_replikatorraum_main_btn
+    name: "Lichtschalter Replikatorraum Toggle Button Main"
+    disabled_by_default: False
+    pin:
+      number: GPIO10
+      inverted: True
+      mode:
+        input: True
+        pullup: True
+    filters:
+      - delayed_on: 100ms
+      - delayed_off: 100ms
+    on_press:
+      - homeassistant.action:
+          action: switch.toggle
+          data:
+            entity_id: switch.replikatorraum_licht_gross
+  - platform: gpio
+    id: licht_replikatorraum_fenster_btn
+    name: "Lichtschalter Replikatorraum Toggle Button Fenster"
+    disabled_by_default: False
+    pin:
+      number: GPIO1
+      inverted: True
+      mode:
+        input: True
+        pullup: True
+    filters:
+      - delayed_on: 100ms
+      - delayed_off: 100ms
+    on_press:
+      - homeassistant.action:
+          action: switch.toggle
+          data:
+            entity_id: switch.replikatorraum_licht_klein
