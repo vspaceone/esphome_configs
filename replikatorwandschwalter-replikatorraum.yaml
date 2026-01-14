@@ -172,7 +172,9 @@ binary_sensor:
                 red: 100%
                 green: 100%
                 blue: 0%
-                flash_length: 0.5s
+    on_release:
+      then:
+        - script.execute: update_light_status1
     on_click:
       min_length: 3s
       max_length: 30s
@@ -206,7 +208,9 @@ binary_sensor:
                 red: 100%
                 green: 100%
                 blue: 0%
-                flash_length: 0.5s
+    on_release:
+      then:
+        - script.execute: update_light_status2
     on_click:
       min_length: 3s
       max_length: 30s
@@ -240,7 +244,9 @@ binary_sensor:
                 red: 100%
                 green: 100%
                 blue: 0%
-                flash_length: 0.5s
+    on_release:
+      then:
+        - script.execute: update_light_status3
     on_click:
       min_length: 3s
       max_length: 30s
@@ -274,7 +280,9 @@ binary_sensor:
                 red: 100%
                 green: 100%
                 blue: 0%
-                flash_length: 0.5s
+    on_release:
+      then:
+        - script.execute: update_light_status4
     on_click:
       min_length: 3s
       max_length: 30s
