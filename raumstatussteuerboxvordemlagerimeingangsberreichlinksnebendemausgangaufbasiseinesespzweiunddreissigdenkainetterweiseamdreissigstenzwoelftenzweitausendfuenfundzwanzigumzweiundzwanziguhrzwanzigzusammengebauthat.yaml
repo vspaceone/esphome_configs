@@ -44,6 +44,8 @@ wifi:
 
 captive_portal:
 
+bluetooth_proxy:
+  active: False
 
 status_led:
   pin:
