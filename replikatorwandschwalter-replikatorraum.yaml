@@ -172,6 +172,7 @@ binary_sensor:
                 red: 100%
                 green: 100%
                 blue: 0%
+                flash_length: 50ms
     on_release:
       then:
         - script.execute: update_light_status1
@@ -208,6 +209,7 @@ binary_sensor:
                 red: 100%
                 green: 100%
                 blue: 0%
+                flash_length: 50ms
     on_release:
       then:
         - script.execute: update_light_status2
@@ -244,6 +246,7 @@ binary_sensor:
                 red: 100%
                 green: 100%
                 blue: 0%
+                flash_length: 50ms
     on_release:
       then:
         - script.execute: update_light_status3
@@ -280,6 +283,7 @@ binary_sensor:
                 red: 100%
                 green: 100%
                 blue: 0%
+                flash_length: 50ms
     on_release:
       then:
         - script.execute: update_light_status4
@@ -377,19 +381,22 @@ script:
               default:
               case 0:
                 // Red when switch is off
-                call.set_rgb(1.0, 0.0, 0.1);
+                call.set_rgb(1.0, 0.0, 0.25);
+                call.set_brightness(0.75);
                 call.set_effect("none");
                 break;
             
               case 1:
                 // Solid green when switch on and current < 1
                 call.set_rgb(0.0, 1.0, 0.0);
+                call.set_brightness(1.00);
                 call.set_effect("none");
                 break;
               
               case 2:
                 // Pulsating green when switch on and current >= 1
                 call.set_rgb(0.0, 1.0, 0.0);
+                call.set_brightness(1.00);
                 call.set_effect("pulse");
                 break;
             }
@@ -416,19 +423,22 @@ script:
               default:
               case 0:
                 // Red when switch is off
-                call.set_rgb(1.0, 0.0, 0.1);
+                call.set_rgb(1.0, 0.0, 0.25);
+                call.set_brightness(0.75);
                 call.set_effect("none");
                 break;
             
               case 1:
                 // Solid green when switch on and current < 1
                 call.set_rgb(0.0, 1.0, 0.0);
+                call.set_brightness(1.00);
                 call.set_effect("none");
                 break;
               
               case 2:
                 // Pulsating green when switch on and current >= 1
                 call.set_rgb(0.0, 1.0, 0.0);
+                call.set_brightness(1.00);
                 call.set_effect("pulse");
                 break;
             }
@@ -455,19 +465,22 @@ script:
               default:
               case 0:
                 // Red when switch is off
-                call.set_rgb(1.0, 0.0, 0.1);
+                call.set_rgb(1.0, 0.0, 0.25);
+                call.set_brightness(0.75);
                 call.set_effect("none");
                 break;
             
               case 1:
                 // Solid green when switch on and current < 1
                 call.set_rgb(0.0, 1.0, 0.0);
+                call.set_brightness(1.00);
                 call.set_effect("none");
                 break;
               
               case 2:
                 // Pulsating green when switch on and current >= 1
                 call.set_rgb(0.0, 1.0, 0.0);
+                call.set_brightness(1.00);
                 call.set_effect("pulse");
                 break;
             }
@@ -494,19 +507,22 @@ script:
               default:
               case 0:
                 // Red when switch is off
-                call.set_rgb(1.0, 0.0, 0.1);
+                call.set_rgb(1.0, 0.0, 0.25);
+                call.set_brightness(0.75);
                 call.set_effect("none");
                 break;
             
               case 1:
                 // Solid green when switch on and current < 1
                 call.set_rgb(0.0, 1.0, 0.0);
+                call.set_brightness(1.00);
                 call.set_effect("none");
                 break;
               
               case 2:
                 // Pulsating green when switch on and current >= 1
                 call.set_rgb(0.0, 1.0, 0.0);
+                call.set_brightness(1.00);
                 call.set_effect("pulse");
                 break;
             }
