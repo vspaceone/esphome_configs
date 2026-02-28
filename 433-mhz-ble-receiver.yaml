@@ -1,0 +1,87 @@
+esphome:
+  name: 433-mhz-ble-receiver
+  friendly_name: 433 MHz + BLE receiver
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "GlkzRMFaJhCNd/i8Hq15qi4mwJZW6KYWIzAUInUmit8="
+
+ota:
+  - platform: esphome
+    password: "91c15cceed24a45944f3caa31cd03e97"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  manual_ip: 
+    static_ip: 10.0.8.44
+    subnet: 255.255.252.0
+    gateway: 10.0.8.1
+    dns1: 10.0.8.1
+    dns2: 1.1.1.1
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "433-Mhz-+-BLE-Receiver"
+    password: "UffirueHCX2m"
+
+captive_portal:
+
+status_led:
+  pin: 8
+
+remote_receiver:
+  pin: GPIO0
+  #dump: all
+  dump: rc_switch
+  tolerance: 55%
+  filter: 300us
+  idle: 10ms
+  buffer_size: 4kb
+
+binary_sensor:
+  - platform: status
+    name: "Online"
+    id: online
+
+  - platform: remote_receiver
+    name: "433 MHz Taste 3D-1"
+    rc_switch_raw:
+      code: "110110000100000000001000"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "433 MHz Taste 3D-2"
+    rc_switch_raw:
+      code: "001100010010110000011000"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "433 MHz Taste 3D-3"
+    rc_switch_raw:
+      code: "110010111110100000011000"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "433 MHz Taste 3D-4"
+    rc_switch_raw:
+      code: "100000010000000000011000"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+
+bluetooth_proxy:
+  active: True
