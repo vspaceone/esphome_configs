@@ -48,10 +48,20 @@ captive_portal:
 status_led:
   pin: 8
 
+bluetooth_proxy:
+  active: True
+esp32_ble_beacon:
+  type: iBeacon
+  uuid: '170841a7-826a-c250-30cf-bbd8c91a8eb5'
+  major: 1337
+  minor: 60
+  tx_power: 9dBm
+
 remote_receiver:
   pin: GPIO0
-  #dump: all
-  dump: rc_switch
+  dump: 
+    - pronto
+    - rc_switch
   tolerance: 55%
   filter: 300us
   idle: 10ms
@@ -180,8 +190,6 @@ binary_sensor:
       protocol: 1
     filters:
       - delayed_off: 200ms
-bluetooth_proxy:
-  active: True
 
 # Configure the output
 output:
