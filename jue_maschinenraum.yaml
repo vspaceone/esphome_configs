@@ -1,0 +1,136 @@
+esphome:
+  name: jue-maschinenraum
+  friendly_name: "Jue Maschinenraum"
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "TzSoZSmyjTQwKTXCnezAPOp9Fxm8LTRO5rUJDK4+73o="
+
+ota:
+  - platform: esphome
+    password: "74bde37db71c847d3e1b866363364340"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: 10.0.8.47
+    subnet: 255.255.252.0
+    gateway: 10.0.8.1
+    dns1: 10.0.8.1
+    dns2: 1.1.1.1
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Juemaschinenraum"
+    password: "n4rSO0g0ubN7"
+
+captive_portal:
+
+bluetooth_proxy:
+  active: True
+
+output:
+  - platform: gpio
+    pin: GPIO4
+    id: barcode_trigger
+    inverted: true
+  - platform: gpio
+    pin: 8
+    id: status_led
+
+uart:
+  id: uart_bus
+  rx_pin: GPIO3
+  baud_rate: 9600
+  debug:
+      direction: BOTH
+      dummy_receiver: true
+      after:
+        delimiter: "\r\n"
+      sequence:
+        - lambda: |-
+            UARTDebug::log_string(direction, bytes);
+            std::string str(bytes.begin(), bytes.end());
+            if (strcmp(str.c_str(), "Pixtxa.de/Jue") == 0) {
+              id(barcode_received) = true;
+            }
+        - if:
+            condition:
+              lambda: 'return id(barcode_received);'
+            then:
+              - binary_sensor.template.publish:
+                  id: jalousie_opened
+                  state: false
+              - logger.log: "Barcode erkannt → geschlossen"
+
+globals:
+  - id: barcode_received
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
+binary_sensor:
+  - platform: template
+    id: jalousie_opened
+    name: "Jalousie Maschinenraum"
+    device_class: opening
+    filters:
+      - timeout: 61s
+
+interval:
+  - interval: 60s
+    then:
+      # Reset
+      - lambda: |-
+          id(barcode_received) = false;
+
+      # Scanner aktivieren (LOW wegen inverted)
+      - output.turn_on: barcode_trigger
+
+      # 5 Sekunden warten, währenddessen UART lesen
+      - delay: 3.3s
+
+      # Scanner deaktivieren (HIGH)
+      - output.turn_off: barcode_trigger
+
+      # Zustand setzen
+      - if:
+          condition:
+            lambda: 'return id(barcode_received);'
+          then:
+            - binary_sensor.template.publish:
+                id: jalousie_opened
+                state: false
+            - logger.log: "Barcode erkannt → geschlossen"
+          else:
+            - binary_sensor.template.publish:
+                id: jalousie_opened
+                state: true
+            - logger.log: "Kein (gültiger) Barcode erkannt → offen"
+
+  - interval: 1s
+    then:
+      - if:
+          condition:
+            api.connected:
+          then:
+            - if:
+                condition:
+                  binary_sensor.is_on: jalousie_opened
+                then:
+                  - output.turn_off: status_led
+                else:
+                  - output.turn_on: status_led
+          else:
+            - output.turn_on: status_led
+            - delay: 0.5s
+            - output.turn_off: status_led
