@@ -50,20 +50,24 @@ status_led:
 
 remote_receiver:
   pin: GPIO0
-  dump: all
-  #dump: rc_switch
+  #dump: all
+  dump: rc_switch
   tolerance: 55%
   filter: 300us
   idle: 10ms
   buffer_size: 4kb
-  on_raw: 
+  #on_pronto: 
+  #  then:
+  #      - homeassistant.event:
+  #          event: esphome.433mhz
+  #          data:
+  #            pronto: !lambda "return x.data;"
+  on_rc_switch:  
     then:
         - homeassistant.event:
-            event: esphome.433mhz_raw
-            variables:
-              raw: x
-            data_template:
-              raw: "{{raw}}"
+            event: esphome.433mhz
+            data:
+              rc_switch: !lambda "char buf[64]; for (uint8_t i=0; i<64; i++) buf[63-i]=((x.code>>i)&1) ? '1' : '0'; return std::string(buf,64);"
 
 binary_sensor:
   - platform: status
