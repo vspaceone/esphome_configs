@@ -14,6 +14,14 @@ logger:
 api:
   encryption:
     key: "GlkzRMFaJhCNd/i8Hq15qi4mwJZW6KYWIzAUInUmit8="
+  actions:
+    - action: rtttl_play
+      variables:
+        song_str: string
+      then:
+        - rtttl.stop
+        - rtttl.play:
+            rtttl: !lambda 'return song_str;'
 
 ota:
   - platform: esphome
@@ -54,8 +62,21 @@ binary_sensor:
     name: "Online"
     id: online
 
+  - platform: gpio
+    pin:
+      number: GPIO10
+      mode:
+        input: true
+        pullup: true
+    device_class: window
+    name: "Druckbar Fenster"
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+
   - platform: remote_receiver
     name: "433 MHz Taste 3D-1"
+    id: d1
     rc_switch_raw:
       code: "110110000100000000001000"
       protocol: 1
@@ -63,6 +84,7 @@ binary_sensor:
       - delayed_off: 200ms
   - platform: remote_receiver
     name: "433 MHz Taste 3D-2"
+    id: d2
     rc_switch_raw:
       code: "001100010010110000011000"
       protocol: 1
@@ -70,6 +92,7 @@ binary_sensor:
       - delayed_off: 200ms
   - platform: remote_receiver
     name: "433 MHz Taste 3D-3"
+    id: d3
     rc_switch_raw:
       code: "110010111110100000011000"
       protocol: 1
@@ -77,11 +100,124 @@ binary_sensor:
       - delayed_off: 200ms
   - platform: remote_receiver
     name: "433 MHz Taste 3D-4"
+    id: d4
     rc_switch_raw:
       code: "100000010000000000011000"
       protocol: 1
     filters:
       - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "433 MHz Taste 3D-Licht"
+    id: dl
+    rc_switch_raw: 
+      code: "101001010110010010011000"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
 
+  - platform: remote_receiver
+    name: "Pink A"
+    id: pink_a
+    rc_switch_raw:
+      code: "000010111000000010101000"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "Pink B"
+    id: pink_b
+    rc_switch_raw:
+      code: "000010111000000010100100"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "Pink C"
+    id: pink_c
+    rc_switch_raw:
+      code: "000010111000000010100010"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "Pink D"
+    id: pink_d
+    rc_switch_raw:
+      code: "000010111000000010100001"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "UwU"
+    rc_switch_raw:
+      code: "100010010001001001011000"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "Heart"
+    rc_switch_raw:
+      code: "010010101100110101101000"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "Music"
+    rc_switch_raw:
+      code: "010001101010110001110001"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
 bluetooth_proxy:
   active: True
+
+# Configure the output
+output:
+  - platform: ledc
+    pin: GPIO7
+    id: rtttl_out
+
+rtttl:
+  output: rtttl_out
+  on_finished_playback:
+    - logger.log: 'Song ended!'
+
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: 4
+    num_leds: 6
+    id: status_leds
+    chipset: WS2812
+
+  - platform: partition
+    name: "LED 1"
+    id: led1
+    segments:
+      - id: status_leds
+        from: 1
+        to: 1
+
+  - platform: partition
+    name: "LED 2"
+    id: led2
+    segments:
+      - id: status_leds
+        from: 2
+        to: 2
+
+  - platform: partition
+    name: "LED 3"
+    id: led3
+    segments:
+      - id: status_leds
+        from: 3
+        to: 3
+
+  - platform: partition
+    name: "LED 4"
+    id: led4
+    segments:
+      - id: status_leds
+        from: 4
+        to: 4
