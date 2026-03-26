@@ -205,6 +205,7 @@ light:
   - platform: partition
     name: "LED 1"
     id: led1
+    restore_mode: ALWAYS_OFF
     segments:
       - id: status_leds
         from: 1
@@ -213,6 +214,7 @@ light:
   - platform: partition
     name: "LED 2"
     id: led2
+    restore_mode: ALWAYS_OFF
     segments:
       - id: status_leds
         from: 2
@@ -221,6 +223,7 @@ light:
   - platform: partition
     name: "LED 3"
     id: led3
+    restore_mode: ALWAYS_OFF
     segments:
       - id: status_leds
         from: 3
@@ -229,6 +232,7 @@ light:
   - platform: partition
     name: "LED 4"
     id: led4
+    restore_mode: ALWAYS_OFF
     segments:
       - id: status_leds
         from: 4
