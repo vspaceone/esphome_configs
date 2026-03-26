@@ -50,12 +50,20 @@ status_led:
 
 remote_receiver:
   pin: GPIO0
-  #dump: all
-  dump: rc_switch
+  dump: all
+  #dump: rc_switch
   tolerance: 55%
   filter: 300us
   idle: 10ms
   buffer_size: 4kb
+  on_raw: 
+    then:
+        - homeassistant.event:
+            event: esphome.433mhz_raw
+            variables:
+              raw: x
+            data_template:
+              raw: "{{raw}}"
 
 binary_sensor:
   - platform: status
