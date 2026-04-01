@@ -60,12 +60,12 @@ esp32_ble_beacon:
 
 remote_receiver:
   pin: GPIO0
-  dump: 
+  dump: #all
     - pronto
     - rc_switch
   tolerance: 55%
   filter: 300us
-  idle: 10ms
+  idle: 5ms
   buffer_size: 4kb
   #on_pronto: 
   #  then:
@@ -192,6 +192,34 @@ binary_sensor:
     filters:
       - delayed_off: 200ms
 
+  - platform: remote_receiver
+    name: "AUX"
+    rc_switch_raw:
+      code: "010001010000010100010101"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "BT"
+    rc_switch_raw:
+      code: "001110001110000000100001"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "CAST"
+    rc_switch_raw:
+      code: "010001010100010100010101"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
+  - platform: remote_receiver
+    name: "DVD"
+    rc_switch_raw:
+      code: "010001010100010100010100"
+      protocol: 1
+    filters:
+      - delayed_off: 200ms
 # Configure the output
 output:
   - platform: ledc
